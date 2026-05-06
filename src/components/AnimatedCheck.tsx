@@ -13,9 +13,11 @@ interface Props {
 
 export function AnimatedCheck({ checked, onChange, label, size = 24, className }: Props) {
   return (
-    <label className={cn('flex items-center gap-3 cursor-pointer select-none group', className)}>
+    <div className={cn('flex items-center gap-3 select-none group', className)}>
       <motion.button
         type="button"
+        aria-pressed={checked}
+        aria-label={label}
         whileTap={{ scale: 1.15 }}
         onClick={() => {
           tick();
@@ -25,8 +27,8 @@ export function AnimatedCheck({ checked, onChange, label, size = 24, className }
         className={cn(
           'rounded-md border flex items-center justify-center transition-colors',
           checked
-            ? 'bg-emerald-500 border-emerald-400 text-slate-950'
-            : 'bg-slate-900 border-slate-700 text-transparent group-hover:border-slate-500'
+            ? 'bg-cyan-400 border-cyan-300 text-slate-950'
+            : 'bg-slate-900 border-slate-700 text-transparent group-hover:border-cyan-500/60'
         )}
       >
         <motion.span
@@ -37,7 +39,18 @@ export function AnimatedCheck({ checked, onChange, label, size = 24, className }
           <Check size={size * 0.65} strokeWidth={3} />
         </motion.span>
       </motion.button>
-      {label && <span className="text-sm text-slate-200">{label}</span>}
-    </label>
+      {label && (
+        <button
+          type="button"
+          onClick={() => {
+            tick();
+            onChange(!checked);
+          }}
+          className="text-left text-sm text-slate-200 leading-snug hover:text-cyan-100"
+        >
+          {label}
+        </button>
+      )}
+    </div>
   );
 }

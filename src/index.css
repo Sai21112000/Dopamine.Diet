@@ -10,13 +10,13 @@
 
 @layer base {
   :root {
-    --background: 222 47% 5%;
+    --background: 222 44% 6%;
     --foreground: 210 40% 98%;
     --card: 222 47% 9%;
     --card-foreground: 210 40% 98%;
     --popover: 222 47% 9%;
     --popover-foreground: 210 40% 98%;
-    --primary: 160 84% 39%;
+    --primary: 188 86% 53%;
     --primary-foreground: 222 47% 5%;
     --secondary: 217 33% 17%;
     --secondary-foreground: 210 40% 98%;
@@ -28,14 +28,17 @@
     --destructive-foreground: 210 40% 98%;
     --border: 217 33% 17%;
     --input: 217 33% 17%;
-    --ring: 160 84% 39%;
+    --ring: 188 86% 53%;
     --radius: 0.625rem;
   }
 }
 
 html, body, #root {
   min-height: 100vh;
-  background-color: rgb(2 6 23);
+  background:
+    radial-gradient(circle at top left, rgba(14, 116, 144, 0.14), transparent 32rem),
+    radial-gradient(circle at bottom right, rgba(49, 46, 129, 0.16), transparent 34rem),
+    rgb(2 6 23);
   color: rgb(226 232 240);
 }
 
@@ -48,13 +51,13 @@ body {
 }
 
 .grade-A-glow {
-  box-shadow: 0 0 24px rgba(250, 204, 21, 0.45);
+  box-shadow: 0 0 24px rgba(103, 232, 249, 0.28);
 }
 .grade-B-glow {
-  box-shadow: 0 0 16px rgba(203, 213, 225, 0.25);
+  box-shadow: 0 0 16px rgba(125, 211, 252, 0.22);
 }
 .grade-C-glow {
-  box-shadow: 0 0 16px rgba(245, 158, 11, 0.3);
+  box-shadow: 0 0 16px rgba(129, 140, 248, 0.22);
 }
 
 @keyframes softPulse {

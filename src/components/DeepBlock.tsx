@@ -27,6 +27,7 @@ interface Props {
 export function DeepBlock({ label, block, dateKey, which, projects, highlight }: Props) {
   const updateDaily = useStore((s) => s.updateDaily);
   const intervalRef = useRef<number>();
+  const completedSoundRef = useRef(false);
 
   useEffect(() => {
     if (block.timerRunning && block.timerSeconds > 0) {
@@ -45,19 +46,31 @@ export function DeepBlock({ label, block, dateKey, which, projects, highlight }:
   }, [block.timerRunning, block.timerSeconds, dateKey, which, updateDaily]);
 
   useEffect(() => {
-    if (block.timerSeconds === 0 && block.complete) chime();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [block.complete]);
+    if (block.timerSeconds === 0 && block.complete && !completedSoundRef.current) {
+      completedSoundRef.current = true;
+      chime();
+    }
+    if (block.timerSeconds > 0) completedSoundRef.current = false;
+  }, [block.complete, block.timerSeconds]);
 
   const toggleRun = () => updateDaily(dateKey, (d) => { d[which].timerRunning = !d[which].timerRunning; });
-  const reset = () => updateDaily(dateKey, (d) => { d[which].timerSeconds = 5400; d[which].timerRunning = false; });
+  const reset = () => updateDaily(dateKey, (d) => {
+    d[which].timerSeconds = d[which].timerTargetSeconds;
+    d[which].timerRunning = false;
+  });
+  const setTimerMinutes = (minutes: number) => updateDaily(dateKey, (d) => {
+    const seconds = Math.max(1, Math.round(minutes * 60));
+    d[which].timerTargetSeconds = seconds;
+    d[which].timerSeconds = seconds;
+    d[which].timerRunning = false;
+  });
 
   return (
     <motion.div
       layout
       className={cn(
-        'rounded-xl border p-5 bg-slate-900 space-y-4',
-        highlight ? 'border-emerald-500/50 shadow-[0_0_32px_-8px_rgba(16,185,129,0.45)]' : 'border-slate-800'
+        'rounded-xl border p-5 bg-slate-900/95 space-y-4',
+        highlight ? 'border-cyan-400/50 shadow-[0_0_32px_-8px_rgba(34,211,238,0.28)]' : 'border-slate-800'
       )}
     >
       <div className="flex items-center justify-between">
@@ -82,6 +95,12 @@ export function DeepBlock({ label, block, dateKey, which, projects, highlight }:
               {projects.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}
             </SelectContent>
           </Select>
+          <Input
+            value={block.project}
+            onChange={(e) => updateDaily(dateKey, (d) => { d[which].project = e.target.value; })}
+            placeholder="Or type a custom project"
+            className="bg-slate-950 border-slate-800 text-slate-100 mt-2 h-8 text-xs"
+          />
         </div>
         <div>
           <label className="text-[11px] uppercase text-slate-500">Micro-Win Target (3 bullets max)</label>
@@ -96,15 +115,26 @@ export function DeepBlock({ label, block, dateKey, which, projects, highlight }:
 
       <div className={cn(
         'rounded-xl bg-slate-950 border p-6 flex flex-col items-center gap-3 transition-colors',
-        block.timerRunning ? 'border-emerald-500/60 shadow-[0_0_24px_-8px_rgba(16,185,129,0.7)]' : 'border-slate-800'
+        block.timerRunning ? 'border-cyan-400/60 shadow-[0_0_24px_-8px_rgba(34,211,238,0.5)]' : 'border-slate-800'
       )}>
+        <div className="flex items-center gap-2 text-xs text-slate-500">
+          <span>Manual timer</span>
+          <Input
+            type="number"
+            min={1}
+            value={Math.round(block.timerTargetSeconds / 60)}
+            onChange={(e) => setTimerMinutes(Number(e.target.value) || 1)}
+            className="w-20 h-8 bg-slate-900 border-slate-800 text-slate-100 text-center"
+          />
+          <span>minutes</span>
+        </div>
         <div className="mono text-5xl md:text-6xl font-semibold text-slate-100 tabular-nums">
           {fmt(block.timerSeconds)}
         </div>
         <div className="flex gap-2">
           <button
             onClick={toggleRun}
-            className="px-4 py-2 rounded-md bg-emerald-500 text-slate-950 font-medium text-sm hover:bg-emerald-400 transition-colors inline-flex items-center gap-1.5"
+            className="px-4 py-2 rounded-md bg-cyan-400 text-slate-950 font-medium text-sm hover:bg-cyan-300 transition-colors inline-flex items-center gap-1.5"
           >
             {block.timerRunning ? <><Pause size={14} /> Pause</> : <><Play size={14} /> Start</>}
           </button>
@@ -130,7 +160,7 @@ export function DeepBlock({ label, block, dateKey, which, projects, highlight }:
               }}
               className={cn(
                 'flex-1 aspect-square rounded-lg border transition-colors',
-                on ? 'bg-emerald-500 border-emerald-400' : 'bg-slate-800 border-slate-700 soft-pulse'
+                on ? 'bg-cyan-400 border-cyan-300' : 'bg-slate-800 border-slate-700 soft-pulse'
               )}
             />
           ))}
@@ -165,7 +195,7 @@ export function DeepBlock({ label, block, dateKey, which, projects, highlight }:
             onClick={() => updateDaily(dateKey, (d) => {
               d[which].distractions.push({ time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), urge: '', parked: false });
             })}
-            className="text-xs text-emerald-300 hover:text-emerald-200 inline-flex items-center gap-1"
+            className="text-xs text-cyan-300 hover:text-cyan-200 inline-flex items-center gap-1"
           >
             <Plus size={12} /> Add Urge
           </button>

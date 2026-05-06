@@ -6,9 +6,10 @@ import { cn } from '@/lib/utils';
 
 function gradeColor(g: Grade | undefined) {
   switch (g) {
-    case 'A': return 'bg-emerald-500';
-    case 'B': return 'bg-emerald-600/80';
-    case 'C': return 'bg-emerald-800/70';
+    case 'A': return 'bg-cyan-300';
+    case 'B': return 'bg-teal-500/80';
+    case 'C': return 'bg-sky-800/70';
+    case 'D': return 'bg-indigo-950';
     default: return 'bg-slate-800';
   }
 }
@@ -48,7 +49,7 @@ export function ContributionGraph({ large = false }: { large?: boolean }) {
   return (
     <TooltipProvider delayDuration={50}>
       <div className="overflow-x-auto">
-        <div className="flex gap-[3px]">
+        <div className="flex gap-[3px] min-h-[92px] min-w-max">
           {cells.map((col, wi) => (
             <div key={wi} className="flex flex-col gap-[3px]">
               {col.map((cell, di) => (
@@ -56,14 +57,15 @@ export function ContributionGraph({ large = false }: { large?: boolean }) {
                   <TooltipTrigger asChild>
                     <div
                       style={{ width: sz, height: sz }}
-                      className={cn('rounded-[2px] transition-colors', cell.date ? gradeColor(cell.grade) : 'bg-transparent')}
+                      title={cell.date ? `${format(new Date(cell.date), 'MMM d')} - Grade ${cell.grade ?? 'Pending'}` : undefined}
+                      className={cn('rounded-[2px] transition-colors', cell.date ? gradeColor(cell.grade) : 'bg-slate-900/60')}
                     />
                   </TooltipTrigger>
                   {cell.date && (
                     <TooltipContent className="bg-slate-900 border-slate-800 text-slate-100">
                       <div className="text-xs">
                         <div className="font-medium">{format(new Date(cell.date), 'MMM d, yyyy')}</div>
-                        <div className="text-slate-400">Grade: {cell.grade ?? '—'}</div>
+                        <div className="text-slate-400">Grade: {cell.grade ?? 'Pending'}</div>
                         {weeklyNorth && <div className="text-slate-500 text-[10px] mt-1 max-w-[160px]">{weeklyNorth}</div>}
                       </div>
                     </TooltipContent>
@@ -76,9 +78,9 @@ export function ContributionGraph({ large = false }: { large?: boolean }) {
         <div className="flex items-center gap-2 mt-3 text-[11px] text-slate-500">
           <span>Less</span>
           <div className="w-2.5 h-2.5 rounded-[2px] bg-slate-800" />
-          <div className="w-2.5 h-2.5 rounded-[2px] bg-emerald-800/70" />
-          <div className="w-2.5 h-2.5 rounded-[2px] bg-emerald-600/80" />
-          <div className="w-2.5 h-2.5 rounded-[2px] bg-emerald-500" />
+          <div className="w-2.5 h-2.5 rounded-[2px] bg-sky-800/70" />
+          <div className="w-2.5 h-2.5 rounded-[2px] bg-teal-500/80" />
+          <div className="w-2.5 h-2.5 rounded-[2px] bg-cyan-300" />
           <span>More</span>
         </div>
       </div>

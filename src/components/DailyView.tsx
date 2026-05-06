@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { format, startOfWeek, addDays, isAfter } from 'date-fns';
 import { Compass, ShieldCheck, Briefcase, ChevronRight, Gift, Sparkles, TriangleAlert as AlertTriangle, Trophy } from 'lucide-react';
@@ -13,9 +13,9 @@ import { cn } from '@/lib/utils';
 
 function gradeColor(g: Grade) {
   switch (g) {
-    case 'A': return 'bg-gradient-to-br from-yellow-300 to-amber-500 text-slate-950 grade-A-glow';
-    case 'B': return 'bg-gradient-to-br from-slate-200 to-slate-400 text-slate-900 grade-B-glow';
-    case 'C': return 'bg-gradient-to-br from-amber-400 to-amber-600 text-slate-950 grade-C-glow';
+    case 'A': return 'bg-gradient-to-br from-cyan-200 to-teal-300 text-slate-950 grade-A-glow';
+    case 'B': return 'bg-gradient-to-br from-sky-200 to-cyan-300 text-slate-950 grade-B-glow';
+    case 'C': return 'bg-gradient-to-br from-indigo-300 to-sky-400 text-slate-950 grade-C-glow';
     case 'D': return 'bg-slate-700 text-slate-300';
     default: return 'bg-slate-800 text-slate-500';
   }
@@ -28,6 +28,7 @@ export function DailyView({ focusMode = false }: { focusMode?: boolean }) {
   const updateDaily = useStore((s) => s.updateDaily);
   const ensureDay = useStore((s) => s.ensureDay);
   const setView = useStore((s) => s.setView);
+  const [customCheck, setCustomCheck] = useState('');
 
   ensureDay(selectedDate);
   const d = state.daily[selectedDate];
@@ -72,7 +73,7 @@ export function DailyView({ focusMode = false }: { focusMode?: boolean }) {
                 className={cn(
                   'px-3 py-1.5 rounded-md text-xs border transition-colors',
                   dk === selectedDate
-                    ? 'bg-emerald-500 text-slate-950 border-emerald-400'
+                    ? 'bg-cyan-400 text-slate-950 border-cyan-300'
                     : 'bg-slate-950 text-slate-300 border-slate-800 hover:border-slate-600',
                   disabled && 'opacity-40 cursor-not-allowed'
                 )}
@@ -90,7 +91,7 @@ export function DailyView({ focusMode = false }: { focusMode?: boolean }) {
             <AccordionItem value="phase1" className="border-0">
               <AccordionTrigger className="px-5 py-4 hover:no-underline text-slate-100">
                 <div className="flex items-center gap-2">
-                  <Compass size={16} className="text-emerald-400" /> Phase 1 · Morning Priming
+                  <Compass size={16} className="text-cyan-300" /> Phase 1 · Morning Priming
                 </div>
               </AccordionTrigger>
               <AccordionContent className="px-5 pb-5 space-y-3">
@@ -107,7 +108,7 @@ export function DailyView({ focusMode = false }: { focusMode?: boolean }) {
                 <AnimatedCheck checked={d.workspaceReady} onChange={(v) => updateDaily(selectedDate, (x) => { x.workspaceReady = v; })} label="Workspace Ready" />
                 <button
                   onClick={() => block2Ref.current?.scrollIntoView({ behavior: 'smooth' })}
-                  className="mt-2 px-4 py-2 rounded-md bg-emerald-500 text-slate-950 font-semibold text-sm hover:bg-emerald-400 transition-colors inline-flex items-center gap-1.5"
+                  className="mt-2 px-4 py-2 rounded-md bg-cyan-400 text-slate-950 font-semibold text-sm hover:bg-cyan-300 transition-colors inline-flex items-center gap-1.5"
                 >
                   Lock In <ChevronRight size={14} />
                 </button>
@@ -127,7 +128,7 @@ export function DailyView({ focusMode = false }: { focusMode?: boolean }) {
             <AccordionItem value="buffer" className="border-0">
               <AccordionTrigger className="px-5 py-4 hover:no-underline text-slate-100">
                 <div className="flex items-center gap-2">
-                  <ShieldCheck size={16} className="text-emerald-400" /> Phase 3 · Buffer Zone
+                  <ShieldCheck size={16} className="text-cyan-300" /> Phase 3 · Buffer Zone
                 </div>
               </AccordionTrigger>
               <AccordionContent className="px-5 pb-5 space-y-2">
@@ -139,6 +140,45 @@ export function DailyView({ focusMode = false }: { focusMode?: boolean }) {
                     label={label}
                   />
                 ))}
+                {d.customChecks.map((item, i) => (
+                  <div key={`${item.label}-${i}`} className="flex items-center gap-2">
+                    <AnimatedCheck
+                      checked={item.checked}
+                      onChange={(v) => updateDaily(selectedDate, (x) => { x.customChecks[i].checked = v; })}
+                    />
+                    <Input
+                      value={item.label}
+                      onChange={(e) => updateDaily(selectedDate, (x) => { x.customChecks[i].label = e.target.value; })}
+                      className="bg-slate-950 border-slate-800 text-slate-100 h-8 text-xs"
+                      placeholder="Custom checklist item"
+                    />
+                  </div>
+                ))}
+                <div className="flex items-center gap-2 pt-1">
+                  <Input
+                    value={customCheck}
+                    onChange={(e) => setCustomCheck(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && customCheck.trim()) {
+                        updateDaily(selectedDate, (x) => { x.customChecks.push({ label: customCheck.trim(), checked: false }); });
+                        setCustomCheck('');
+                      }
+                    }}
+                    placeholder="+ Add custom checklist item"
+                    className="bg-slate-950 border-slate-800 text-slate-100 h-8 text-xs"
+                  />
+                  <button
+                    onClick={() => {
+                      if (customCheck.trim()) {
+                        updateDaily(selectedDate, (x) => { x.customChecks.push({ label: customCheck.trim(), checked: false }); });
+                        setCustomCheck('');
+                      }
+                    }}
+                    className="px-2.5 h-8 rounded-md bg-cyan-400 text-slate-950 hover:bg-cyan-300 transition-colors"
+                  >
+                    Add
+                  </button>
+                </div>
               </AccordionContent>
             </AccordionItem>
           </Accordion>
@@ -150,7 +190,7 @@ export function DailyView({ focusMode = false }: { focusMode?: boolean }) {
       <Card className="bg-slate-900 border-slate-800">
         <CardHeader className="pb-2">
           <CardTitle className="text-slate-100 text-base flex items-center gap-2">
-            <Briefcase size={16} className="text-emerald-400" /> Phase 5 · Evening Shutdown
+            <Briefcase size={16} className="text-cyan-300" /> Phase 5 · Evening Shutdown
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -188,7 +228,7 @@ export function DailyView({ focusMode = false }: { focusMode?: boolean }) {
       <Card className="bg-slate-900 border-slate-800">
         <CardHeader className="pb-2">
           <CardTitle className="text-slate-100 text-base flex items-center gap-2">
-            <Gift size={16} className="text-emerald-400" /> Phase 6 · Earned Dopamine
+            <Gift size={16} className="text-cyan-300" /> Phase 6 · Earned Dopamine
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -206,20 +246,22 @@ export function DailyView({ focusMode = false }: { focusMode?: boolean }) {
               className={cn(
                 'px-4 py-2 rounded-md text-sm font-medium border transition-colors',
                 d.reward.claimed && !d.reward.stolen
-                  ? 'bg-emerald-500 text-slate-950 border-emerald-400'
-                  : 'bg-slate-950 text-slate-300 border-slate-800 hover:border-emerald-500',
+                  ? 'bg-cyan-400 text-slate-950 border-cyan-300'
+                  : 'bg-slate-950 text-slate-300 border-slate-800 hover:border-cyan-500',
                 !rewardEnabled && 'opacity-40 cursor-not-allowed'
               )}
             >
               Claimed Fairly
             </button>
             <button
+              disabled={!rewardEnabled}
               onClick={() => updateDaily(selectedDate, (x) => { x.reward.stolen = true; x.reward.claimed = false; })}
               className={cn(
                 'px-4 py-2 rounded-md text-sm font-medium border transition-colors',
                 d.reward.stolen
                   ? 'bg-rose-500 text-slate-950 border-rose-400'
-                  : 'bg-slate-950 text-slate-300 border-slate-800 hover:border-rose-500'
+                  : 'bg-slate-950 text-slate-300 border-slate-800 hover:border-rose-500',
+                !rewardEnabled && 'opacity-40 cursor-not-allowed'
               )}
             >
               Stolen
@@ -255,7 +297,7 @@ export function DailyView({ focusMode = false }: { focusMode?: boolean }) {
       <Card className="bg-slate-900 border-slate-800">
         <CardHeader className="pb-2">
           <CardTitle className="text-slate-100 text-base flex items-center gap-2">
-            <Trophy size={16} className="text-emerald-400" /> Phase 8 · Daily Scoreboard
+            <Trophy size={16} className="text-cyan-300" /> Phase 8 · Daily Scoreboard
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -263,9 +305,9 @@ export function DailyView({ focusMode = false }: { focusMode?: boolean }) {
             {scoreboard.map((s, i) => (
               <div key={i} className={cn(
                 'flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs',
-                s.on ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-200' : 'bg-slate-800/60 border-slate-700 text-slate-400'
+                s.on ? 'bg-cyan-500/10 border-cyan-500/40 text-cyan-100' : 'bg-slate-800/60 border-slate-700 text-slate-400'
               )}>
-                <span className={cn('w-1.5 h-1.5 rounded-full', s.on ? 'bg-emerald-400' : 'bg-slate-600')} />
+                <span className={cn('w-1.5 h-1.5 rounded-full', s.on ? 'bg-cyan-300' : 'bg-slate-600')} />
                 {s.label}
               </div>
             ))}
@@ -286,7 +328,7 @@ export function DailyView({ focusMode = false }: { focusMode?: boolean }) {
             )}
           >
             <Sparkles size={20} />
-            {d.grade ?? '—'}
+            {d.grade ?? 'Pending'}
             <span className="text-xs font-normal opacity-80 ml-1">daily grade</span>
           </motion.div>
           <div className="mt-3 text-xs text-slate-500">
@@ -296,7 +338,7 @@ export function DailyView({ focusMode = false }: { focusMode?: boolean }) {
             {d.grade === 'D' && (
               <span className="inline-flex items-center gap-2">
                 <span className="px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-400">Unplanned</span>
-                <button onClick={() => setView('daily')} className="text-emerald-400 hover:text-emerald-300">Plan Tomorrow →</button>
+                <button onClick={() => setView('daily')} className="text-cyan-300 hover:text-cyan-200">Plan Tomorrow</button>
               </span>
             )}
           </div>

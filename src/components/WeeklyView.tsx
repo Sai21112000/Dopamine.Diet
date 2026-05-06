@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Flame, Plus, Trash2, BookOpen, Target, ListChecks, Star, Archive } from 'lucide-react';
+import { Flame, Plus, Trash2, BookOpen, Target, ListChecks, Star, Archive, RotateCcw } from 'lucide-react';
 import { format, addDays } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -28,16 +28,24 @@ export function WeeklyView({ full = false }: { full?: boolean }) {
   const updateWeekly = useStore((s) => s.updateWeekly);
   const streak = state.meta.streakCount;
   const [parkInput, setParkInput] = useState('');
+  const [newTrack, setNewTrack] = useState('');
+  const [itemInputs, setItemInputs] = useState<Record<number, string>>({});
+  const [customReview, setCustomReview] = useState('');
 
-  const projectNames = state.weekly.projectMenu.flatMap((t) => t.items.map((i) => i.name)).filter(Boolean);
+  const projectOptions = state.weekly.projectMenu.flatMap((track) =>
+    track.items
+      .filter((item) => item.name.trim())
+      .map((item) => ({ name: item.name, track: track.track }))
+  );
+  const projectNames = Array.from(new Set(projectOptions.map((option) => option.name)));
 
   return (
     <div className="space-y-4">
-      <Card className="bg-slate-900 border-slate-800">
+      <Card className="bg-slate-900/95 border-slate-800">
         <CardContent className="p-5">
-          <blockquote className="text-sm text-slate-300 italic leading-relaxed border-l-2 border-emerald-500/60 pl-3">
+          <blockquote className="text-sm text-slate-300 italic leading-relaxed border-l-2 border-cyan-400/60 pl-3">
             "You do not rise to the level of your goals. You fall to the level of your systems."
-            <span className="block text-xs text-slate-500 mt-1 not-italic">— James Clear</span>
+            <span className="block text-xs text-slate-500 mt-1 not-italic">- James Clear</span>
           </blockquote>
           <div className="mt-4">
             <label className="text-xs uppercase tracking-wide text-slate-500 flex items-center gap-1.5">
@@ -56,7 +64,7 @@ export function WeeklyView({ full = false }: { full?: boolean }) {
         </CardContent>
       </Card>
 
-      <Card className="bg-slate-900 border-slate-800">
+      <Card className="bg-slate-900/95 border-slate-800">
         <CardHeader className="pb-2 flex flex-row items-center justify-between">
           <CardTitle className="text-slate-100 text-base">Contribution Graph</CardTitle>
           <motion.div
@@ -75,52 +83,142 @@ export function WeeklyView({ full = false }: { full?: boolean }) {
         </CardContent>
       </Card>
 
-      <Card className="bg-slate-900 border-slate-800">
+      <Card className="bg-slate-900/95 border-slate-800">
         <CardHeader className="pb-2">
-          <CardTitle className="text-slate-100 text-base flex items-center gap-2">
-            <ListChecks size={16} className="text-emerald-400" /> Project Menu
-            <span className="text-xs font-normal text-slate-500 ml-2">Reference only</span>
-          </CardTitle>
+          <div className="flex items-center justify-between gap-3">
+            <CardTitle className="text-slate-100 text-base flex items-center gap-2">
+              <ListChecks size={16} className="text-cyan-300" /> Project Menu
+              <span className="text-xs font-normal text-slate-500 ml-2">Editable defaults</span>
+            </CardTitle>
+            <button
+              onClick={() => {
+                if (confirm('Reset project menu to defaults?')) {
+                  updateWeekly((w) => { w.projectMenu = JSON.parse(JSON.stringify([
+                    { track: 'Agents & Chatbots', items: [{ name: 'AI Chatbot', checked: false }, { name: 'Agent Building', checked: false }] },
+                    { track: 'Research', items: [{ name: 'Paper: Before AI', checked: false }, { name: 'Paper: After AI', checked: false }, { name: 'OCR Paper + Code', checked: false }, { name: 'TTS Paper + Code', checked: false }] },
+                    { track: 'Fast Track', items: [{ name: 'Docker', checked: false }, { name: 'AWS/GCP', checked: false }, { name: 'K8s', checked: false }, { name: 'SQL/Postgres/Mongo', checked: false }, { name: 'MCP Server', checked: false }, { name: 'Model Armor', checked: false }] },
+                    { track: 'LLM Engineering', items: [{ name: 'Unsloth 2B FT', checked: false }, { name: 'LLM Deploy', checked: false }] },
+                    { track: 'Courses/Use Cases', items: [{ name: 'RL', checked: false }, { name: 'LangChain', checked: false }, { name: 'LangGraph', checked: false }, { name: 'CrewAI', checked: false }, { name: 'Google Vertex', checked: false }] },
+                    { track: 'Competitions', items: [] },
+                  ])); });
+                }
+              }}
+              className="text-xs text-slate-500 hover:text-cyan-300 inline-flex items-center gap-1"
+            >
+              <RotateCcw size={12} /> Reset
+            </button>
+          </div>
         </CardHeader>
         <CardContent className="space-y-3">
           {state.weekly.projectMenu.map((track, ti) => (
-            <div key={track.track} className="border border-slate-800 rounded-lg p-3 bg-slate-950/50">
-              <div className="text-xs font-semibold text-slate-300 mb-2">{track.track}</div>
-              <div className="flex flex-wrap gap-3">
+            <div key={`${track.track}-${ti}`} className="border border-slate-800 rounded-lg p-3 bg-slate-950/50">
+              <div className="flex items-center gap-2 mb-3">
+                <Input
+                  value={track.track}
+                  onChange={(e) => updateWeekly((w) => { w.projectMenu[ti].track = e.target.value; })}
+                  className="bg-slate-900 border-slate-800 text-slate-100 h-8 text-xs font-semibold"
+                  placeholder="Track name"
+                />
+                <button
+                  onClick={() => updateWeekly((w) => { w.projectMenu.splice(ti, 1); })}
+                  className="text-slate-500 hover:text-rose-400 transition-colors"
+                  aria-label={`Delete ${track.track}`}
+                >
+                  <Trash2 size={14} />
+                </button>
+              </div>
+              <div className="space-y-2">
                 {track.items.map((item, ii) => (
-                  <AnimatedCheck
-                    key={ii}
-                    size={18}
-                    checked={item.checked}
-                    onChange={(v) => updateWeekly((w) => { w.projectMenu[ti].items[ii].checked = v; })}
-                    label={item.name}
-                  />
+                  <div key={`${item.name}-${ii}`} className="flex items-center gap-2">
+                    <AnimatedCheck
+                      size={18}
+                      checked={item.checked}
+                      onChange={(v) => updateWeekly((w) => { w.projectMenu[ti].items[ii].checked = v; })}
+                    />
+                    <Input
+                      value={item.name}
+                      onChange={(e) => updateWeekly((w) => { w.projectMenu[ti].items[ii].name = e.target.value; })}
+                      className="bg-slate-950 border-slate-800 text-slate-100 h-8 text-xs"
+                      placeholder="Project item"
+                    />
+                    <button
+                      onClick={() => updateWeekly((w) => { w.projectMenu[ti].items.splice(ii, 1); })}
+                      className="text-slate-500 hover:text-rose-400 transition-colors"
+                      aria-label={`Delete ${item.name}`}
+                    >
+                      <Trash2 size={13} />
+                    </button>
+                  </div>
                 ))}
-                {track.track === 'Competitions' && (
+                <div className="flex items-center gap-2 pt-1">
                   <Input
-                    value={track.extra ?? ''}
-                    onChange={(e) => updateWeekly((w) => { w.projectMenu[ti].extra = e.target.value; })}
-                    placeholder="Kaggle: competition name"
-                    className="bg-slate-950 border-slate-800 text-slate-100 h-8 text-xs max-w-xs"
+                    value={itemInputs[ti] ?? ''}
+                    onChange={(e) => setItemInputs((prev) => ({ ...prev, [ti]: e.target.value }))}
+                    onKeyDown={(e) => {
+                      const value = (itemInputs[ti] ?? '').trim();
+                      if (e.key === 'Enter' && value) {
+                        updateWeekly((w) => { w.projectMenu[ti].items.push({ name: value, checked: false }); });
+                        setItemInputs((prev) => ({ ...prev, [ti]: '' }));
+                      }
+                    }}
+                    placeholder="+ Add custom item"
+                    className="bg-slate-950 border-slate-800 text-slate-100 h-8 text-xs"
                   />
-                )}
+                  <button
+                    onClick={() => {
+                      const value = (itemInputs[ti] ?? '').trim();
+                      if (value) {
+                        updateWeekly((w) => { w.projectMenu[ti].items.push({ name: value, checked: false }); });
+                        setItemInputs((prev) => ({ ...prev, [ti]: '' }));
+                      }
+                    }}
+                    className="px-2.5 h-8 rounded-md bg-cyan-400 text-slate-950 hover:bg-cyan-300 transition-colors"
+                  >
+                    <Plus size={14} />
+                  </button>
+                </div>
               </div>
             </div>
           ))}
+          <div className="flex items-center gap-2 border border-dashed border-slate-800 rounded-lg p-3 bg-slate-950/30">
+            <Input
+              value={newTrack}
+              onChange={(e) => setNewTrack(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && newTrack.trim()) {
+                  updateWeekly((w) => { w.projectMenu.push({ track: newTrack.trim(), items: [] }); });
+                  setNewTrack('');
+                }
+              }}
+              placeholder="+ New custom track"
+              className="bg-slate-950 border-slate-800 text-slate-100 h-8 text-xs"
+            />
+            <button
+              onClick={() => {
+                if (newTrack.trim()) {
+                  updateWeekly((w) => { w.projectMenu.push({ track: newTrack.trim(), items: [] }); });
+                  setNewTrack('');
+                }
+              }}
+              className="px-3 h-8 rounded-md bg-cyan-400 text-slate-950 hover:bg-cyan-300 transition-colors"
+            >
+              <Plus size={14} />
+            </button>
+          </div>
         </CardContent>
       </Card>
 
       <Card className="bg-slate-900 border-slate-800">
         <CardHeader className="pb-2">
           <CardTitle className="text-slate-100 text-base flex items-center gap-2">
-            <Target size={16} className="text-emerald-400" /> Flagship Projects
+            <Target size={16} className="text-cyan-300" /> Flagship Projects
           </CardTitle>
         </CardHeader>
         <CardContent className="grid md:grid-cols-2 gap-3">
           {state.weekly.flagshipProjects.map((fp, idx) => (
             <div key={idx} className="border border-slate-800 rounded-lg p-4 bg-slate-950/60">
               <div className="flex items-center justify-between mb-2">
-                <Badge className={cn('font-mono', idx === 0 ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-300' : 'bg-slate-700/40 border-slate-600 text-slate-200')}>
+                <Badge className={cn('font-mono', idx === 0 ? 'bg-cyan-500/15 border-cyan-500/40 text-cyan-200' : 'bg-slate-700/40 border-slate-600 text-slate-200')}>
                   {fp.priority}
                 </Badge>
                 <AnimatedCheck
@@ -136,9 +234,22 @@ export function WeeklyView({ full = false }: { full?: boolean }) {
                 </SelectTrigger>
                 <SelectContent className="bg-slate-900 border-slate-800 text-slate-100">
                   {projectNames.length === 0 && <div className="px-2 py-1.5 text-xs text-slate-500">Add items to Project Menu first</div>}
-                  {projectNames.map((n) => <SelectItem key={n} value={n}>{n}</SelectItem>)}
+                  {projectOptions.map((option) => (
+                    <SelectItem key={`${option.track}-${option.name}`} value={option.name}>
+                      <span className="inline-flex items-center gap-2">
+                        <span className="text-[10px] text-cyan-300">{option.track}</span>
+                        <span>{option.name}</span>
+                      </span>
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
+              <Input
+                value={fp.name}
+                onChange={(e) => updateWeekly((w) => { w.flagshipProjects[idx].name = e.target.value; })}
+                placeholder="Or type a custom flagship"
+                className="bg-slate-950 border-slate-800 text-slate-100 mb-2 h-8 text-xs"
+              />
               <Textarea
                 value={fp.outcome}
                 onChange={(e) => updateWeekly((w) => { w.flagshipProjects[idx].outcome = e.target.value; })}
@@ -175,7 +286,7 @@ export function WeeklyView({ full = false }: { full?: boolean }) {
                   setParkInput('');
                 }
               }}
-              className="px-3 rounded-md bg-emerald-500 text-slate-950 hover:bg-emerald-400 transition-colors"
+              className="px-3 rounded-md bg-cyan-400 text-slate-950 hover:bg-cyan-300 transition-colors"
             >
               <Plus size={16} />
             </button>
@@ -211,7 +322,7 @@ export function WeeklyView({ full = false }: { full?: boolean }) {
       <Card className="bg-slate-900 border-slate-800">
         <CardHeader className="pb-2">
           <CardTitle className="text-slate-100 text-base flex items-center gap-2">
-            <BookOpen size={16} className="text-emerald-400" /> Learning Sprint
+            <BookOpen size={16} className="text-cyan-300" /> Learning Sprint
           </CardTitle>
         </CardHeader>
         <CardContent className="grid md:grid-cols-2 gap-3">
@@ -283,7 +394,7 @@ export function WeeklyView({ full = false }: { full?: boolean }) {
                       </td>
                       <td className="py-1 px-2">
                         <span className={cn('inline-block px-2 py-0.5 rounded-md text-xs border', gradeBadgeClasses(grade))}>
-                          {grade ?? '—'}
+                          {grade ?? 'Pending'}
                         </span>
                       </td>
                     </tr>
@@ -311,6 +422,52 @@ export function WeeklyView({ full = false }: { full?: boolean }) {
                     label={label}
                   />
                 ))}
+                {state.weekly.reviewCustom.map((item, i) => (
+                  <div key={`${item.label}-${i}`} className="flex items-center gap-2">
+                    <AnimatedCheck
+                      checked={item.checked}
+                      onChange={(v) => updateWeekly((w) => { w.reviewCustom[i].checked = v; })}
+                    />
+                    <Input
+                      value={item.label}
+                      onChange={(e) => updateWeekly((w) => { w.reviewCustom[i].label = e.target.value; })}
+                      className="bg-slate-950 border-slate-800 text-slate-100 h-8 text-xs"
+                      placeholder="Custom review item"
+                    />
+                    <button
+                      onClick={() => updateWeekly((w) => { w.reviewCustom.splice(i, 1); })}
+                      className="text-slate-500 hover:text-rose-400 transition-colors"
+                      aria-label={`Delete ${item.label}`}
+                    >
+                      <Trash2 size={13} />
+                    </button>
+                  </div>
+                ))}
+                <div className="flex items-center gap-2">
+                  <Input
+                    value={customReview}
+                    onChange={(e) => setCustomReview(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && customReview.trim()) {
+                        updateWeekly((w) => { w.reviewCustom.push({ label: customReview.trim(), checked: false }); });
+                        setCustomReview('');
+                      }
+                    }}
+                    placeholder="+ Add custom checklist item"
+                    className="bg-slate-950 border-slate-800 text-slate-100 h-8 text-xs"
+                  />
+                  <button
+                    onClick={() => {
+                      if (customReview.trim()) {
+                        updateWeekly((w) => { w.reviewCustom.push({ label: customReview.trim(), checked: false }); });
+                        setCustomReview('');
+                      }
+                    }}
+                    className="px-2.5 h-8 rounded-md bg-cyan-400 text-slate-950 hover:bg-cyan-300 transition-colors"
+                  >
+                    <Plus size={14} />
+                  </button>
+                </div>
                 <Textarea
                   value={state.weekly.reviewTweak}
                   onChange={(e) => updateWeekly((w) => { w.reviewTweak = e.target.value; })}
@@ -344,13 +501,13 @@ export function WeeklyView({ full = false }: { full?: boolean }) {
                     </div>
                   </AccordionTrigger>
                   <AccordionContent className="space-y-2 text-sm">
-                    <div className="text-slate-400">North Star: <span className="text-slate-200">{a.northStar || '—'}</span></div>
-                    <div className="text-slate-400">P1: <span className="text-slate-200">{a.p1.name || '—'}</span> — {a.p1.outcome}</div>
-                    <div className="text-slate-400">P2: <span className="text-slate-200">{a.p2.name || '—'}</span> — {a.p2.outcome}</div>
+                    <div className="text-slate-400">North Star: <span className="text-slate-200">{a.northStar || 'Not set'}</span></div>
+                    <div className="text-slate-400">P1: <span className="text-slate-200">{a.p1.name || 'Not set'}</span> - {a.p1.outcome}</div>
+                    <div className="text-slate-400">P2: <span className="text-slate-200">{a.p2.name || 'Not set'}</span> - {a.p2.outcome}</div>
                     <div className="flex gap-2 mt-1">
                       {Object.entries(a.dailyGrades).map(([d, g]) => (
                         <span key={d} className={cn('text-[10px] px-1.5 py-0.5 rounded border', gradeBadgeClasses(g))}>
-                          {format(new Date(d), 'EEE')}:{g ?? '—'}
+                          {format(new Date(d), 'EEE')}:{g ?? 'Pending'}
                         </span>
                       ))}
                     </div>

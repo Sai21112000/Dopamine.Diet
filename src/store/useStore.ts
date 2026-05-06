@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { format, startOfWeek, addDays, differenceInCalendarDays, subDays } from 'date-fns';
-import { supabase, APP_STATE_ID } from '@/lib/supabase';
 
 export type Grade = 'A' | 'B' | 'C' | 'D' | null;
 
@@ -8,6 +7,7 @@ export interface BlockState {
   project: string;
   target: string;
   timerSeconds: number;
+  timerTargetSeconds: number;
   timerRunning: boolean;
   segments: boolean[];
   wins: boolean[];
@@ -30,6 +30,7 @@ export interface DailyState {
   reward: { text: string; claimed: boolean; stolen: boolean };
   hallucination: string[];
   zeroSwitching: boolean;
+  customChecks: { label: string; checked: boolean }[];
   grade: Grade;
 }
 
@@ -54,6 +55,7 @@ export interface WeeklyState {
   dailyThemes: Record<string, { morning: string; afternoon: string; evening: string }>;
   projectMenu: ProjectTrack[];
   reviewChecklist: boolean[];
+  reviewCustom: { label: string; checked: boolean }[];
   reviewTweak: string;
 }
 
@@ -99,6 +101,7 @@ function makeBlock(): BlockState {
     project: '',
     target: '',
     timerSeconds: 5400,
+    timerTargetSeconds: 5400,
     timerRunning: false,
     segments: [false, false, false, false, false, false],
     wins: [false, false, false],
@@ -123,6 +126,7 @@ export function makeDaily(): DailyState {
     reward: { text: '', claimed: false, stolen: false },
     hallucination: ['', '', ''],
     zeroSwitching: false,
+    customChecks: [],
     grade: null,
   };
 }
@@ -139,8 +143,9 @@ function makeWeekly(): WeeklyState {
     parkingLot: [],
     learningSprint: { topic: '', target: '' },
     dailyThemes: themes,
-    projectMenu: DEFAULT_TRACKS,
+    projectMenu: clone(DEFAULT_TRACKS),
     reviewChecklist: [false, false, false, false, false],
+    reviewCustom: [],
     reviewTweak: '',
   };
 }
@@ -157,6 +162,55 @@ const initialState: AppState = {
   daily: { [todayStr]: makeDaily() },
   archive: [],
 };
+
+function clone<T>(value: T): T {
+  return JSON.parse(JSON.stringify(value)) as T;
+}
+
+function normalizeBlock(block: Partial<BlockState> | undefined): BlockState {
+  const next = { ...makeBlock(), ...(block ?? {}) };
+  next.timerTargetSeconds = next.timerTargetSeconds || next.timerSeconds || 5400;
+  next.timerSeconds = Number.isFinite(next.timerSeconds) ? next.timerSeconds : next.timerTargetSeconds;
+  return next;
+}
+
+function normalizeDaily(day: Partial<DailyState> | undefined): DailyState {
+  const next = { ...makeDaily(), ...(day ?? {}) };
+  next.block1 = normalizeBlock(next.block1);
+  next.block2 = normalizeBlock(next.block2);
+  next.buffer = [...next.buffer, false, false, false].slice(0, 3);
+  next.winLog = [...next.winLog, '', '', ''].slice(0, 3);
+  next.hallucination = [...next.hallucination, '', '', ''].slice(0, 3);
+  next.customChecks = next.customChecks ?? [];
+  next.grade = computeGrade(next);
+  return next;
+}
+
+function normalizeWeekly(weekly: Partial<WeeklyState> | undefined): WeeklyState {
+  const next = { ...makeWeekly(), ...(weekly ?? {}) };
+  next.projectMenu = (next.projectMenu.length ? next.projectMenu : clone(DEFAULT_TRACKS)).map((track) => ({
+    track: track.track || 'Custom Track',
+    items: track.items ?? [],
+    extra: track.extra,
+  }));
+  next.reviewChecklist = [...next.reviewChecklist, false, false, false, false, false].slice(0, 5);
+  next.reviewCustom = next.reviewCustom ?? [];
+  return next;
+}
+
+function normalizeState(state: Partial<AppState>): AppState {
+  const daily: Record<string, DailyState> = {};
+  Object.entries(state.daily ?? {}).forEach(([date, day]) => {
+    daily[date] = normalizeDaily(day);
+  });
+  if (!daily[todayStr]) daily[todayStr] = makeDaily();
+  return {
+    meta: { ...initialState.meta, ...(state.meta ?? {}), lastOpened: todayStr },
+    weekly: normalizeWeekly(state.weekly),
+    daily,
+    archive: state.archive ?? [],
+  };
+}
 
 export function computeGrade(d: DailyState): Grade {
   const b1 = d.block1.complete;
@@ -208,17 +262,8 @@ function saveLocal(state: AppState) {
 
 let syncTimer: number | undefined;
 function syncRemote(state: AppState) {
-  saveLocal(state);
-  if (!supabase) return;
-  const client = supabase;
   if (syncTimer) window.clearTimeout(syncTimer);
-  syncTimer = window.setTimeout(async () => {
-    try {
-      await client.from('app_state').upsert({ id: APP_STATE_ID, data: state, updated_at: new Date().toISOString() });
-    } catch (error) {
-      console.warn('Unable to sync app state to Supabase.', error);
-    }
-  }, 600);
+  syncTimer = window.setTimeout(() => saveLocal(state), 250);
 }
 
 interface StoreActions {
@@ -255,17 +300,8 @@ export const useStore = create<StoreActions>((set, get) => ({
 
   hydrate: async () => {
     let loaded: AppState | null = loadLocal();
-    if (supabase) {
-      try {
-        const { data } = await supabase.from('app_state').select('data').eq('id', APP_STATE_ID).maybeSingle();
-        if (data?.data) loaded = data.data as AppState;
-      } catch (error) {
-        console.warn('Unable to load app state from Supabase.', error);
-      }
-    }
     if (loaded) {
-      if (!loaded.daily[todayStr]) loaded.daily[todayStr] = makeDaily();
-      loaded.meta.lastOpened = todayStr;
+      loaded = normalizeState(loaded);
       loaded.meta.streakCount = computeStreak(loaded.daily);
       set({ state: loaded, hydrated: true, selectedDate: todayStr });
       syncRemote(loaded);
@@ -340,8 +376,9 @@ export const useStore = create<StoreActions>((set, get) => ({
   },
 
   importData: (data) => {
-    set({ state: data });
-    syncRemote(data);
+    const next = normalizeState(data);
+    set({ state: next });
+    syncRemote(next);
   },
 
   reset: () => {

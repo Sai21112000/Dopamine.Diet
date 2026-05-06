@@ -41,7 +41,7 @@ function App() {
           </div>
         )}
         <footer className="mt-10 text-center text-xs text-slate-600">
-          Systems over goals. Local + Supabase synced.
+          Local-first. Your data stays in this browser unless you export it.
         </footer>
       </main>
     </div>
