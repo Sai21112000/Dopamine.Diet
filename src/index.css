@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer base {
+  :root {
+    --background: 222 47% 5%;
+    --foreground: 210 40% 98%;
+    --card: 222 47% 9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 160 84% 39%;
+    --primary-foreground: 222 47% 5%;
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 217 33% 17%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 73% 55%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 160 84% 39%;
+    --radius: 0.625rem;
+  }
+}
+
+html, body, #root {
+  min-height: 100vh;
+  background-color: rgb(2 6 23);
+  color: rgb(226 232 240);
+}
+
+body {
+  margin: 0;
+}
+
+.mono {
+  font-family: 'SFMono-Regular', ui-monospace, Menlo, Monaco, Consolas, monospace;
+}
+
+.grade-A-glow {
+  box-shadow: 0 0 24px rgba(250, 204, 21, 0.45);
+}
+.grade-B-glow {
+  box-shadow: 0 0 16px rgba(203, 213, 225, 0.25);
+}
+.grade-C-glow {
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.3);
+}
+
+@keyframes softPulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+.soft-pulse { animation: softPulse 2.5s ease-in-out infinite; }
