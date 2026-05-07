@@ -61,7 +61,7 @@ export function DailyView({ focusMode = false }: { focusMode?: boolean }) {
     <div className="space-y-4">
       <Card className="bg-card border-border text-card-foreground">
         <CardContent className="p-4 flex flex-wrap items-center gap-2">
-          <span className="text-xs uppercase text-muted-foreground mr-2">Date</span>
+          <span className="text-[12px] uppercase text-muted-foreground mr-2">Date</span>
           {weekDates.map((dk) => {
             const dt = new Date(dk);
             const disabled = isAfter(dt, new Date());
@@ -71,7 +71,7 @@ export function DailyView({ focusMode = false }: { focusMode?: boolean }) {
                 disabled={disabled}
                 onClick={() => setSelectedDate(dk)}
                 className={cn(
-                  'px-3 py-1.5 rounded-md text-xs border transition-colors',
+                  'px-3 py-1.5 rounded-md text-[12px] border transition-colors',
                   dk === selectedDate
                     ? 'bg-primary text-primary-foreground border-primary'
                     : 'bg-background text-foreground border-border hover:border-primary/60',
@@ -96,7 +96,7 @@ export function DailyView({ focusMode = false }: { focusMode?: boolean }) {
               </AccordionTrigger>
               <AccordionContent className="px-5 pb-5 space-y-3">
                 <div>
-                  <label className="text-[11px] uppercase text-muted-foreground">North Star (today)</label>
+                  <label className="text-[12px] uppercase text-muted-foreground">North Star (today)</label>
                   <Input
                     value={d.northStar}
                     onChange={(e) => updateDaily(selectedDate, (x) => { x.northStar = e.target.value; })}
@@ -149,7 +149,7 @@ export function DailyView({ focusMode = false }: { focusMode?: boolean }) {
                     <Input
                       value={item.label}
                       onChange={(e) => updateDaily(selectedDate, (x) => { x.customChecks[i].label = e.target.value; })}
-                      className="bg-background border-input text-foreground h-8 text-xs"
+                      className="bg-background border-input text-foreground h-8 text-[12px]"
                       placeholder="Custom checklist item"
                     />
                   </div>
@@ -165,7 +165,7 @@ export function DailyView({ focusMode = false }: { focusMode?: boolean }) {
                       }
                     }}
                     placeholder="+ Add custom checklist item"
-                    className="bg-background border-input text-foreground h-8 text-xs"
+                    className="bg-background border-input text-foreground h-8 text-[12px]"
                   />
                   <button
                     onClick={() => {
@@ -195,7 +195,7 @@ export function DailyView({ focusMode = false }: { focusMode?: boolean }) {
         </CardHeader>
         <CardContent className="space-y-3">
           <div>
-            <label className="text-[11px] uppercase text-muted-foreground">Win Log · Shipped Today</label>
+            <label className="text-[12px] uppercase text-muted-foreground">Win Log · Shipped Today</label>
             <div className="space-y-2 mt-1">
               {[0, 1, 2].map((i) => (
                 <Input
@@ -214,7 +214,7 @@ export function DailyView({ focusMode = false }: { focusMode?: boolean }) {
             label="Parking Lot Pruned"
           />
           <div>
-            <label className="text-[11px] uppercase text-muted-foreground">Tomorrow Primed</label>
+            <label className="text-[12px] uppercase text-muted-foreground">Tomorrow Primed</label>
             <Input
               value={d.tomorrowPrimed}
               onChange={(e) => updateDaily(selectedDate, (x) => { x.tomorrowPrimed = e.target.value; })}
@@ -238,7 +238,7 @@ export function DailyView({ focusMode = false }: { focusMode?: boolean }) {
             placeholder="Reward (e.g., 1 YouTube doc, Gaming 1hr)"
             className="bg-background border-input text-foreground"
           />
-          {!rewardEnabled && <div className="text-xs text-muted-foreground italic">Unlocks when both Deep Blocks are complete.</div>}
+          {!rewardEnabled && <div className="text-[12px] text-muted-foreground italic">Unlocks when both Deep Blocks are complete.</div>}
           <div className="flex gap-2">
             <button
               disabled={!rewardEnabled}
@@ -283,7 +283,7 @@ export function DailyView({ focusMode = false }: { focusMode?: boolean }) {
             'If my future self watched a timelapse, respect or disappointment?',
           ].map((q, i) => (
             <div key={i}>
-              <label className="text-xs text-muted-foreground">{q}</label>
+              <label className="text-[12px] text-muted-foreground">{q}</label>
               <Textarea
                 value={d.hallucination[i]}
                 onChange={(e) => updateDaily(selectedDate, (x) => { x.hallucination[i] = e.target.value; })}
@@ -304,7 +304,7 @@ export function DailyView({ focusMode = false }: { focusMode?: boolean }) {
           <div className="flex flex-wrap items-center gap-2 mb-4">
             {scoreboard.map((s, i) => (
               <div key={i} className={cn(
-                'flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs',
+                'flex items-center gap-2 px-3 py-1.5 rounded-full border text-[12px]',
                 s.on ? 'bg-primary/10 border-primary/40 text-primary' : 'bg-muted/60 border-border text-muted-foreground'
               )}>
                 <span className={cn('w-1.5 h-1.5 rounded-full', s.on ? 'bg-primary' : 'bg-muted-foreground')} />
@@ -329,9 +329,9 @@ export function DailyView({ focusMode = false }: { focusMode?: boolean }) {
           >
             <Sparkles size={20} />
             {d.grade ?? 'Pending'}
-            <span className="text-xs font-normal opacity-80 ml-1">daily grade</span>
+            <span className="text-[12px] font-normal opacity-80 ml-1">daily grade</span>
           </motion.div>
-          <div className="mt-3 text-xs text-muted-foreground">
+          <div className="mt-3 text-[12px] text-muted-foreground">
             {d.grade === 'A' && 'Both blocks complete, zero switching, real wins logged.'}
             {d.grade === 'B' && 'Both blocks complete.'}
             {d.grade === 'C' && 'Only one block complete.'}

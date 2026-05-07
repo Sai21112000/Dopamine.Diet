@@ -3,9 +3,17 @@ import { ListTodo, Plus, Trash2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { AnimatedCheck } from './AnimatedCheck';
 import { useStore } from '@/store/useStore';
 import { cn } from '@/lib/utils';
+
+function todoRows(text: string) {
+  const visualRows = text
+    .split('\n')
+    .reduce((rows, line) => rows + Math.max(1, Math.ceil(line.length / 30)), 0);
+  return Math.min(6, visualRows);
+}
 
 export function TodoPanel() {
   const todos = useStore((s) => s.state.todos);
@@ -32,7 +40,7 @@ export function TodoPanel() {
             To Do List
           </CardTitle>
           {completedCount > 0 && (
-            <Button variant="ghost" size="sm" onClick={clearCompletedTodos} className="h-7 px-2 text-xs text-muted-foreground">
+            <Button variant="ghost" size="sm" onClick={clearCompletedTodos} className="h-7 px-2 text-[12px] text-muted-foreground">
               <X size={13} className="mr-1" />
               Clear done
             </Button>
@@ -62,29 +70,27 @@ export function TodoPanel() {
         ) : (
           <div className="space-y-2">
             {todos.map((todo) => (
-              <div
-                key={todo.id}
-                className="group flex items-center gap-2 rounded-lg border border-border bg-background/70 px-3 py-2"
-              >
+              <div key={todo.id} className="group flex items-start gap-2 rounded-lg border border-border bg-background/70 px-3 py-2">
                 <AnimatedCheck
                   checked={todo.done}
                   onChange={() => toggleTodo(todo.id)}
                   size={20}
-                  className="shrink-0"
+                  className="shrink-0 pt-1"
                 />
-                <Input
+                <Textarea
                   value={todo.text}
                   onChange={(e) => updateTodo(todo.id, e.target.value)}
                   className={cn(
-                    'h-8 border-0 bg-transparent px-0 shadow-none focus-visible:ring-0',
+                    'min-h-8 flex-1 resize-none overflow-hidden whitespace-pre-wrap break-words border-0 bg-transparent px-0 py-0 text-base leading-relaxed shadow-none focus-visible:ring-0',
                     todo.done && 'text-muted-foreground line-through'
                   )}
                   aria-label="Todo text"
+                  rows={todoRows(todo.text)}
                 />
                 <button
                   type="button"
                   onClick={() => deleteTodo(todo.id)}
-                  className="rounded-md p-1 text-muted-foreground opacity-70 transition-colors hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100"
+                  className="mt-1 rounded-md p-1 text-muted-foreground opacity-70 transition-colors hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100"
                   aria-label="Delete todo"
                 >
                   <Trash2 size={14} />

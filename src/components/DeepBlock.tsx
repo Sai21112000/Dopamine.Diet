@@ -85,13 +85,13 @@ export function DeepBlock({ label, block, dateKey, which, projects, highlight }:
 
       <div className="grid md:grid-cols-2 gap-3">
         <div>
-          <label className="text-[11px] uppercase text-muted-foreground">Project</label>
+          <label className="text-[12px] uppercase text-muted-foreground">Project</label>
           <Select value={block.project || undefined} onValueChange={(v) => updateDaily(dateKey, (d) => { d[which].project = v; })}>
             <SelectTrigger className="bg-background border-input text-foreground mt-1">
               <SelectValue placeholder="Select project" />
             </SelectTrigger>
             <SelectContent className="bg-popover border-border text-popover-foreground">
-              {projects.length === 0 && <div className="px-2 py-1 text-xs text-muted-foreground">No projects yet</div>}
+              {projects.length === 0 && <div className="px-2 py-1 text-[12px] text-muted-foreground">No projects yet</div>}
               {projects.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}
             </SelectContent>
           </Select>
@@ -99,11 +99,11 @@ export function DeepBlock({ label, block, dateKey, which, projects, highlight }:
             value={block.project}
             onChange={(e) => updateDaily(dateKey, (d) => { d[which].project = e.target.value; })}
             placeholder="Or type a custom project"
-            className="bg-background border-input text-foreground mt-2 h-8 text-xs"
+            className="bg-background border-input text-foreground mt-2 h-8 text-[12px]"
           />
         </div>
         <div>
-          <label className="text-[11px] uppercase text-muted-foreground">Micro-Win Target (3 bullets max)</label>
+          <label className="text-[12px] uppercase text-muted-foreground">Micro-Win Target (3 bullets max)</label>
           <Textarea
             value={block.target}
             onChange={(e) => updateDaily(dateKey, (d) => { d[which].target = e.target.value; })}
@@ -117,7 +117,7 @@ export function DeepBlock({ label, block, dateKey, which, projects, highlight }:
         'rounded-xl bg-background border p-6 flex flex-col items-center gap-3 transition-colors',
         block.timerRunning ? 'border-primary/60 shadow-[0_0_24px_-8px_rgba(34,211,238,0.4)]' : 'border-border'
       )}>
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <div className="flex items-center gap-2 text-[12px] text-muted-foreground">
           <span>Manual timer</span>
           <Input
             type="number"
@@ -148,7 +148,7 @@ export function DeepBlock({ label, block, dateKey, which, projects, highlight }:
       </div>
 
       <div>
-        <label className="text-[11px] uppercase text-muted-foreground">15-min Segments</label>
+        <label className="text-[12px] uppercase text-muted-foreground">15-min Segments</label>
         <div className="flex gap-2 mt-2">
           {block.segments.map((on, i) => (
             <motion.button
@@ -168,7 +168,7 @@ export function DeepBlock({ label, block, dateKey, which, projects, highlight }:
       </div>
 
       <div>
-        <label className="text-[11px] uppercase text-muted-foreground">Micro-Wins</label>
+        <label className="text-[12px] uppercase text-muted-foreground">Micro-Wins</label>
         <div className="space-y-2 mt-2">
           {[0, 1, 2].map((i) => (
             <div key={i} className="flex items-center gap-2">
@@ -190,28 +190,28 @@ export function DeepBlock({ label, block, dateKey, which, projects, highlight }:
 
       <div>
         <div className="flex items-center justify-between mb-2">
-          <label className="text-[11px] uppercase text-muted-foreground">Distraction Log</label>
+          <label className="text-[12px] uppercase text-muted-foreground">Distraction Log</label>
           <button
             onClick={() => updateDaily(dateKey, (d) => {
               d[which].distractions.push({ time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), urge: '', parked: false });
             })}
-            className="text-xs text-primary hover:text-primary/80 inline-flex items-center gap-1"
+            className="text-[12px] text-primary hover:text-primary/80 inline-flex items-center gap-1"
           >
             <Plus size={12} /> Add Urge
           </button>
         </div>
         {block.distractions.length === 0 ? (
-          <div className="text-xs text-muted-foreground italic">No urges logged.</div>
+          <div className="text-[12px] text-muted-foreground italic">No urges logged.</div>
         ) : (
           <div className="space-y-1.5">
             {block.distractions.map((dx, i) => (
               <div key={i} className="flex items-center gap-2 bg-background/70 border border-border rounded-md px-2 py-1">
-                <span className="text-xs text-muted-foreground w-14 mono">{dx.time}</span>
+                <span className="text-[12px] text-muted-foreground w-14 mono">{dx.time}</span>
                 <Input
                   value={dx.urge}
                   onChange={(e) => updateDaily(dateKey, (d) => { d[which].distractions[i].urge = e.target.value; })}
                   placeholder="What's pulling you?"
-                  className="bg-card border-input text-foreground h-7 text-xs flex-1"
+                  className="bg-card border-input text-foreground h-7 text-[12px] flex-1"
                 />
                 <AnimatedCheck
                   size={18}
