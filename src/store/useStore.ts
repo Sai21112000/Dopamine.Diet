@@ -69,6 +69,13 @@ export interface ArchiveEntry {
   northStar: string;
 }
 
+export interface TodoItem {
+  id: string;
+  text: string;
+  done: boolean;
+  createdAt: string;
+}
+
 export interface MetaState {
   currentWeekStart: string;
   streakCount: number;
@@ -83,6 +90,7 @@ export interface AppState {
   weekly: WeeklyState;
   daily: Record<string, DailyState>;
   archive: ArchiveEntry[];
+  todos: TodoItem[];
 }
 
 const DEFAULT_TRACKS: ProjectTrack[] = [
@@ -161,6 +169,7 @@ const initialState: AppState = {
   weekly: makeWeekly(),
   daily: { [todayStr]: makeDaily() },
   archive: [],
+  todos: [],
 };
 
 function clone<T>(value: T): T {
@@ -198,17 +207,32 @@ function normalizeWeekly(weekly: Partial<WeeklyState> | undefined): WeeklyState 
   return next;
 }
 
+function normalizeTodo(todo: Partial<TodoItem> | undefined, index: number): TodoItem | null {
+  const text = todo?.text?.trim() ?? '';
+  if (!text) return null;
+  return {
+    id: todo?.id || `todo-${index}-${Date.now()}`,
+    text,
+    done: Boolean(todo?.done),
+    createdAt: todo?.createdAt || new Date().toISOString(),
+  };
+}
+
 function normalizeState(state: Partial<AppState>): AppState {
   const daily: Record<string, DailyState> = {};
   Object.entries(state.daily ?? {}).forEach(([date, day]) => {
     daily[date] = normalizeDaily(day);
   });
   if (!daily[todayStr]) daily[todayStr] = makeDaily();
+  const todos = (state.todos ?? [])
+    .map((todo, index) => normalizeTodo(todo, index))
+    .filter((todo): todo is TodoItem => Boolean(todo));
   return {
     meta: { ...initialState.meta, ...(state.meta ?? {}), lastOpened: todayStr },
     weekly: normalizeWeekly(state.weekly),
     daily,
     archive: state.archive ?? [],
+    todos,
   };
 }
 
@@ -278,6 +302,11 @@ interface StoreActions {
   ensureDay: (date: string) => void;
   updateDaily: (date: string, fn: (d: DailyState) => void) => void;
   updateWeekly: (fn: (w: WeeklyState) => void) => void;
+  addTodo: (text: string) => void;
+  toggleTodo: (id: string) => void;
+  updateTodo: (id: string, text: string) => void;
+  deleteTodo: (id: string) => void;
+  clearCompletedTodos: () => void;
   archiveWeek: (fullWipe: boolean) => void;
   importData: (data: AppState) => void;
   reset: () => void;
@@ -342,6 +371,55 @@ export const useStore = create<StoreActions>((set, get) => ({
     syncRemote(next);
   },
 
+  addTodo: (text) => {
+    const trimmed = text.trim();
+    if (!trimmed) return;
+    const s = get().state;
+    const todo: TodoItem = {
+      id: crypto.randomUUID?.() ?? `todo-${Date.now()}`,
+      text: trimmed,
+      done: false,
+      createdAt: new Date().toISOString(),
+    };
+    const next = { ...s, todos: [todo, ...s.todos] };
+    set({ state: next });
+    syncRemote(next);
+  },
+
+  toggleTodo: (id) => {
+    const s = get().state;
+    const next = {
+      ...s,
+      todos: s.todos.map((todo) => (todo.id === id ? { ...todo, done: !todo.done } : todo)),
+    };
+    set({ state: next });
+    syncRemote(next);
+  },
+
+  updateTodo: (id, text) => {
+    const s = get().state;
+    const next = {
+      ...s,
+      todos: s.todos.map((todo) => (todo.id === id ? { ...todo, text } : todo)),
+    };
+    set({ state: next });
+    syncRemote(next);
+  },
+
+  deleteTodo: (id) => {
+    const s = get().state;
+    const next = { ...s, todos: s.todos.filter((todo) => todo.id !== id) };
+    set({ state: next });
+    syncRemote(next);
+  },
+
+  clearCompletedTodos: () => {
+    const s = get().state;
+    const next = { ...s, todos: s.todos.filter((todo) => !todo.done) };
+    set({ state: next });
+    syncRemote(next);
+  },
+
   archiveWeek: (fullWipe) => {
     const s = get().state;
     const wkStart = s.meta.currentWeekStart;
@@ -370,6 +448,7 @@ export const useStore = create<StoreActions>((set, get) => ({
       weekly: freshWeekly,
       daily: { [todayStr]: makeDaily() },
       archive: [entry, ...s.archive],
+      todos: s.todos,
     };
     set({ state: next });
     syncRemote(next);

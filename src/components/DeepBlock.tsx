@@ -69,12 +69,12 @@ export function DeepBlock({ label, block, dateKey, which, projects, highlight }:
     <motion.div
       layout
       className={cn(
-        'rounded-xl border p-5 bg-slate-900/95 space-y-4',
-        highlight ? 'border-cyan-400/50 shadow-[0_0_32px_-8px_rgba(34,211,238,0.28)]' : 'border-slate-800'
+        'rounded-xl border p-5 bg-card text-card-foreground space-y-4',
+        highlight ? 'border-primary/50 shadow-[0_0_32px_-8px_rgba(34,211,238,0.28)]' : 'border-border'
       )}
     >
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-slate-100">{label}</h3>
+        <h3 className="text-sm font-semibold text-foreground">{label}</h3>
         <AnimatedCheck
           size={22}
           checked={block.complete}
@@ -85,13 +85,13 @@ export function DeepBlock({ label, block, dateKey, which, projects, highlight }:
 
       <div className="grid md:grid-cols-2 gap-3">
         <div>
-          <label className="text-[11px] uppercase text-slate-500">Project</label>
+          <label className="text-[11px] uppercase text-muted-foreground">Project</label>
           <Select value={block.project || undefined} onValueChange={(v) => updateDaily(dateKey, (d) => { d[which].project = v; })}>
-            <SelectTrigger className="bg-slate-950 border-slate-800 text-slate-100 mt-1">
+            <SelectTrigger className="bg-background border-input text-foreground mt-1">
               <SelectValue placeholder="Select project" />
             </SelectTrigger>
-            <SelectContent className="bg-slate-900 border-slate-800 text-slate-100">
-              {projects.length === 0 && <div className="px-2 py-1 text-xs text-slate-500">No projects yet</div>}
+            <SelectContent className="bg-popover border-border text-popover-foreground">
+              {projects.length === 0 && <div className="px-2 py-1 text-xs text-muted-foreground">No projects yet</div>}
               {projects.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}
             </SelectContent>
           </Select>
@@ -99,48 +99,48 @@ export function DeepBlock({ label, block, dateKey, which, projects, highlight }:
             value={block.project}
             onChange={(e) => updateDaily(dateKey, (d) => { d[which].project = e.target.value; })}
             placeholder="Or type a custom project"
-            className="bg-slate-950 border-slate-800 text-slate-100 mt-2 h-8 text-xs"
+            className="bg-background border-input text-foreground mt-2 h-8 text-xs"
           />
         </div>
         <div>
-          <label className="text-[11px] uppercase text-slate-500">Micro-Win Target (3 bullets max)</label>
+          <label className="text-[11px] uppercase text-muted-foreground">Micro-Win Target (3 bullets max)</label>
           <Textarea
             value={block.target}
             onChange={(e) => updateDaily(dateKey, (d) => { d[which].target = e.target.value; })}
             placeholder="- ship X&#10;- fix Y&#10;- write Z"
-            className="bg-slate-950 border-slate-800 text-slate-100 mt-1 min-h-[72px]"
+            className="bg-background border-input text-foreground mt-1 min-h-[72px]"
           />
         </div>
       </div>
 
       <div className={cn(
-        'rounded-xl bg-slate-950 border p-6 flex flex-col items-center gap-3 transition-colors',
-        block.timerRunning ? 'border-cyan-400/60 shadow-[0_0_24px_-8px_rgba(34,211,238,0.5)]' : 'border-slate-800'
+        'rounded-xl bg-background border p-6 flex flex-col items-center gap-3 transition-colors',
+        block.timerRunning ? 'border-primary/60 shadow-[0_0_24px_-8px_rgba(34,211,238,0.4)]' : 'border-border'
       )}>
-        <div className="flex items-center gap-2 text-xs text-slate-500">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <span>Manual timer</span>
           <Input
             type="number"
             min={1}
             value={Math.round(block.timerTargetSeconds / 60)}
             onChange={(e) => setTimerMinutes(Number(e.target.value) || 1)}
-            className="w-20 h-8 bg-slate-900 border-slate-800 text-slate-100 text-center"
+            className="w-20 h-8 bg-card border-input text-foreground text-center"
           />
           <span>minutes</span>
         </div>
-        <div className="mono text-5xl md:text-6xl font-semibold text-slate-100 tabular-nums">
+        <div className="mono text-5xl md:text-6xl font-semibold text-foreground tabular-nums">
           {fmt(block.timerSeconds)}
         </div>
         <div className="flex gap-2">
           <button
             onClick={toggleRun}
-            className="px-4 py-2 rounded-md bg-cyan-400 text-slate-950 font-medium text-sm hover:bg-cyan-300 transition-colors inline-flex items-center gap-1.5"
+            className="px-4 py-2 rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition-colors inline-flex items-center gap-1.5"
           >
             {block.timerRunning ? <><Pause size={14} /> Pause</> : <><Play size={14} /> Start</>}
           </button>
           <button
             onClick={reset}
-            className="px-4 py-2 rounded-md bg-slate-800 text-slate-200 font-medium text-sm hover:bg-slate-700 transition-colors inline-flex items-center gap-1.5"
+            className="px-4 py-2 rounded-md bg-secondary text-secondary-foreground font-medium text-sm hover:bg-secondary/80 transition-colors inline-flex items-center gap-1.5"
           >
             <RotateCcw size={14} /> Reset
           </button>
@@ -148,7 +148,7 @@ export function DeepBlock({ label, block, dateKey, which, projects, highlight }:
       </div>
 
       <div>
-        <label className="text-[11px] uppercase text-slate-500">15-min Segments</label>
+        <label className="text-[11px] uppercase text-muted-foreground">15-min Segments</label>
         <div className="flex gap-2 mt-2">
           {block.segments.map((on, i) => (
             <motion.button
@@ -160,7 +160,7 @@ export function DeepBlock({ label, block, dateKey, which, projects, highlight }:
               }}
               className={cn(
                 'flex-1 aspect-square rounded-lg border transition-colors',
-                on ? 'bg-cyan-400 border-cyan-300' : 'bg-slate-800 border-slate-700 soft-pulse'
+                on ? 'bg-primary border-primary' : 'bg-muted border-border soft-pulse'
               )}
             />
           ))}
@@ -168,7 +168,7 @@ export function DeepBlock({ label, block, dateKey, which, projects, highlight }:
       </div>
 
       <div>
-        <label className="text-[11px] uppercase text-slate-500">Micro-Wins</label>
+        <label className="text-[11px] uppercase text-muted-foreground">Micro-Wins</label>
         <div className="space-y-2 mt-2">
           {[0, 1, 2].map((i) => (
             <div key={i} className="flex items-center gap-2">
@@ -181,7 +181,7 @@ export function DeepBlock({ label, block, dateKey, which, projects, highlight }:
                 value={block.winsText[i]}
                 onChange={(e) => updateDaily(dateKey, (d) => { d[which].winsText[i] = e.target.value; })}
                 placeholder={`Win ${i + 1}`}
-                className="bg-slate-950 border-slate-800 text-slate-100 h-8"
+                className="bg-background border-input text-foreground h-8"
               />
             </div>
           ))}
@@ -190,28 +190,28 @@ export function DeepBlock({ label, block, dateKey, which, projects, highlight }:
 
       <div>
         <div className="flex items-center justify-between mb-2">
-          <label className="text-[11px] uppercase text-slate-500">Distraction Log</label>
+          <label className="text-[11px] uppercase text-muted-foreground">Distraction Log</label>
           <button
             onClick={() => updateDaily(dateKey, (d) => {
               d[which].distractions.push({ time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), urge: '', parked: false });
             })}
-            className="text-xs text-cyan-300 hover:text-cyan-200 inline-flex items-center gap-1"
+            className="text-xs text-primary hover:text-primary/80 inline-flex items-center gap-1"
           >
             <Plus size={12} /> Add Urge
           </button>
         </div>
         {block.distractions.length === 0 ? (
-          <div className="text-xs text-slate-600 italic">No urges logged.</div>
+          <div className="text-xs text-muted-foreground italic">No urges logged.</div>
         ) : (
           <div className="space-y-1.5">
             {block.distractions.map((dx, i) => (
-              <div key={i} className="flex items-center gap-2 bg-slate-950/70 border border-slate-800 rounded-md px-2 py-1">
-                <span className="text-xs text-slate-500 w-14 mono">{dx.time}</span>
+              <div key={i} className="flex items-center gap-2 bg-background/70 border border-border rounded-md px-2 py-1">
+                <span className="text-xs text-muted-foreground w-14 mono">{dx.time}</span>
                 <Input
                   value={dx.urge}
                   onChange={(e) => updateDaily(dateKey, (d) => { d[which].distractions[i].urge = e.target.value; })}
                   placeholder="What's pulling you?"
-                  className="bg-slate-900 border-slate-800 text-slate-100 h-7 text-xs flex-1"
+                  className="bg-card border-input text-foreground h-7 text-xs flex-1"
                 />
                 <AnimatedCheck
                   size={18}
@@ -221,7 +221,7 @@ export function DeepBlock({ label, block, dateKey, which, projects, highlight }:
                 />
                 <button
                   onClick={() => updateDaily(dateKey, (d) => { d[which].distractions.splice(i, 1); })}
-                  className="text-slate-500 hover:text-rose-400"
+                  className="text-muted-foreground hover:text-destructive"
                 >
                   <Trash2 size={12} />
                 </button>

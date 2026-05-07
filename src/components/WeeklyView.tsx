@@ -16,10 +16,10 @@ import { cn } from '@/lib/utils';
 function gradeBadgeClasses(g: Grade) {
   switch (g) {
     case 'A': return 'bg-yellow-400/15 text-yellow-300 border-yellow-400/30';
-    case 'B': return 'bg-slate-400/15 text-slate-200 border-slate-400/30';
+    case 'B': return 'bg-secondary text-secondary-foreground border-border';
     case 'C': return 'bg-amber-500/15 text-amber-300 border-amber-500/30';
     case 'D': return 'bg-rose-500/15 text-rose-300 border-rose-500/30';
-    default: return 'bg-slate-800 text-slate-500 border-slate-700';
+    default: return 'bg-muted text-muted-foreground border-border';
   }
 }
 
@@ -41,32 +41,32 @@ export function WeeklyView({ full = false }: { full?: boolean }) {
 
   return (
     <div className="space-y-4">
-      <Card className="bg-slate-900/95 border-slate-800">
+      <Card className="bg-card border-border text-card-foreground">
         <CardContent className="p-5">
-          <blockquote className="text-sm text-slate-300 italic leading-relaxed border-l-2 border-cyan-400/60 pl-3">
+          <blockquote className="text-sm text-foreground italic leading-relaxed border-l-2 border-primary/60 pl-3">
             "You do not rise to the level of your goals. You fall to the level of your systems."
-            <span className="block text-xs text-slate-500 mt-1 not-italic">- James Clear</span>
+            <span className="block text-xs text-muted-foreground mt-1 not-italic">- James Clear</span>
           </blockquote>
           <div className="mt-4">
-            <label className="text-xs uppercase tracking-wide text-slate-500 flex items-center gap-1.5">
+            <label className="text-xs uppercase tracking-wide text-muted-foreground flex items-center gap-1.5">
               <Star size={12} /> Weekly North Star
             </label>
             <div className="flex items-center gap-2 mt-1.5">
-              <span className="text-slate-400 text-sm">This week is a win if:</span>
+              <span className="text-muted-foreground text-sm">This week is a win if:</span>
               <Input
                 value={state.weekly.northStar}
                 onChange={(e) => updateWeekly((w) => { w.northStar = e.target.value; })}
                 placeholder="..."
-                className="bg-slate-950 border-slate-800 text-slate-100 flex-1"
+                className="bg-background border-input text-foreground flex-1"
               />
             </div>
           </div>
         </CardContent>
       </Card>
 
-      <Card className="bg-slate-900/95 border-slate-800">
+      <Card className="bg-card border-border text-card-foreground">
         <CardHeader className="pb-2 flex flex-row items-center justify-between">
-          <CardTitle className="text-slate-100 text-base">Contribution Graph</CardTitle>
+          <CardTitle className="text-foreground text-base">Contribution Graph</CardTitle>
           <motion.div
             key={streak}
             initial={{ scale: 1 }}
@@ -83,12 +83,12 @@ export function WeeklyView({ full = false }: { full?: boolean }) {
         </CardContent>
       </Card>
 
-      <Card className="bg-slate-900/95 border-slate-800">
+      <Card className="bg-card border-border text-card-foreground">
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between gap-3">
-            <CardTitle className="text-slate-100 text-base flex items-center gap-2">
-              <ListChecks size={16} className="text-cyan-300" /> Project Menu
-              <span className="text-xs font-normal text-slate-500 ml-2">Editable defaults</span>
+            <CardTitle className="text-foreground text-base flex items-center gap-2">
+              <ListChecks size={16} className="text-primary" /> Project Menu
+              <span className="text-xs font-normal text-muted-foreground ml-2">Editable defaults</span>
             </CardTitle>
             <button
               onClick={() => {
@@ -103,7 +103,7 @@ export function WeeklyView({ full = false }: { full?: boolean }) {
                   ])); });
                 }
               }}
-              className="text-xs text-slate-500 hover:text-cyan-300 inline-flex items-center gap-1"
+              className="text-xs text-muted-foreground hover:text-primary inline-flex items-center gap-1"
             >
               <RotateCcw size={12} /> Reset
             </button>
@@ -111,17 +111,17 @@ export function WeeklyView({ full = false }: { full?: boolean }) {
         </CardHeader>
         <CardContent className="space-y-3">
           {state.weekly.projectMenu.map((track, ti) => (
-            <div key={`${track.track}-${ti}`} className="border border-slate-800 rounded-lg p-3 bg-slate-950/50">
+            <div key={`${track.track}-${ti}`} className="border border-border rounded-lg p-3 bg-background/50">
               <div className="flex items-center gap-2 mb-3">
                 <Input
                   value={track.track}
                   onChange={(e) => updateWeekly((w) => { w.projectMenu[ti].track = e.target.value; })}
-                  className="bg-slate-900 border-slate-800 text-slate-100 h-8 text-xs font-semibold"
+                  className="bg-card border-input text-foreground h-8 text-xs font-semibold"
                   placeholder="Track name"
                 />
                 <button
                   onClick={() => updateWeekly((w) => { w.projectMenu.splice(ti, 1); })}
-                  className="text-slate-500 hover:text-rose-400 transition-colors"
+                  className="text-muted-foreground hover:text-destructive transition-colors"
                   aria-label={`Delete ${track.track}`}
                 >
                   <Trash2 size={14} />
@@ -138,12 +138,12 @@ export function WeeklyView({ full = false }: { full?: boolean }) {
                     <Input
                       value={item.name}
                       onChange={(e) => updateWeekly((w) => { w.projectMenu[ti].items[ii].name = e.target.value; })}
-                      className="bg-slate-950 border-slate-800 text-slate-100 h-8 text-xs"
+                      className="bg-background border-input text-foreground h-8 text-xs"
                       placeholder="Project item"
                     />
                     <button
                       onClick={() => updateWeekly((w) => { w.projectMenu[ti].items.splice(ii, 1); })}
-                      className="text-slate-500 hover:text-rose-400 transition-colors"
+                      className="text-muted-foreground hover:text-destructive transition-colors"
                       aria-label={`Delete ${item.name}`}
                     >
                       <Trash2 size={13} />
@@ -162,7 +162,7 @@ export function WeeklyView({ full = false }: { full?: boolean }) {
                       }
                     }}
                     placeholder="+ Add custom item"
-                    className="bg-slate-950 border-slate-800 text-slate-100 h-8 text-xs"
+                    className="bg-background border-input text-foreground h-8 text-xs"
                   />
                   <button
                     onClick={() => {
@@ -172,7 +172,7 @@ export function WeeklyView({ full = false }: { full?: boolean }) {
                         setItemInputs((prev) => ({ ...prev, [ti]: '' }));
                       }
                     }}
-                    className="px-2.5 h-8 rounded-md bg-cyan-400 text-slate-950 hover:bg-cyan-300 transition-colors"
+                    className="px-2.5 h-8 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
                   >
                     <Plus size={14} />
                   </button>
@@ -180,7 +180,7 @@ export function WeeklyView({ full = false }: { full?: boolean }) {
               </div>
             </div>
           ))}
-          <div className="flex items-center gap-2 border border-dashed border-slate-800 rounded-lg p-3 bg-slate-950/30">
+          <div className="flex items-center gap-2 border border-dashed border-border rounded-lg p-3 bg-background/30">
             <Input
               value={newTrack}
               onChange={(e) => setNewTrack(e.target.value)}
@@ -191,7 +191,7 @@ export function WeeklyView({ full = false }: { full?: boolean }) {
                 }
               }}
               placeholder="+ New custom track"
-              className="bg-slate-950 border-slate-800 text-slate-100 h-8 text-xs"
+              className="bg-background border-input text-foreground h-8 text-xs"
             />
             <button
               onClick={() => {
@@ -200,7 +200,7 @@ export function WeeklyView({ full = false }: { full?: boolean }) {
                   setNewTrack('');
                 }
               }}
-              className="px-3 h-8 rounded-md bg-cyan-400 text-slate-950 hover:bg-cyan-300 transition-colors"
+              className="px-3 h-8 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
             >
               <Plus size={14} />
             </button>
@@ -208,17 +208,17 @@ export function WeeklyView({ full = false }: { full?: boolean }) {
         </CardContent>
       </Card>
 
-      <Card className="bg-slate-900 border-slate-800">
+      <Card className="bg-card border-border text-card-foreground">
         <CardHeader className="pb-2">
-          <CardTitle className="text-slate-100 text-base flex items-center gap-2">
-            <Target size={16} className="text-cyan-300" /> Flagship Projects
+          <CardTitle className="text-foreground text-base flex items-center gap-2">
+            <Target size={16} className="text-primary" /> Flagship Projects
           </CardTitle>
         </CardHeader>
         <CardContent className="grid md:grid-cols-2 gap-3">
           {state.weekly.flagshipProjects.map((fp, idx) => (
-            <div key={idx} className="border border-slate-800 rounded-lg p-4 bg-slate-950/60">
+            <div key={idx} className="border border-border rounded-lg p-4 bg-background/60">
               <div className="flex items-center justify-between mb-2">
-                <Badge className={cn('font-mono', idx === 0 ? 'bg-cyan-500/15 border-cyan-500/40 text-cyan-200' : 'bg-slate-700/40 border-slate-600 text-slate-200')}>
+                <Badge className={cn('font-mono', idx === 0 ? 'bg-primary/15 border-primary/40 text-primary' : 'bg-secondary border-border text-secondary-foreground')}>
                   {fp.priority}
                 </Badge>
                 <AnimatedCheck
@@ -229,15 +229,15 @@ export function WeeklyView({ full = false }: { full?: boolean }) {
                 />
               </div>
               <Select value={fp.name || undefined} onValueChange={(v) => updateWeekly((w) => { w.flagshipProjects[idx].name = v; })}>
-                <SelectTrigger className="bg-slate-950 border-slate-800 text-slate-100 mb-2">
+                <SelectTrigger className="bg-background border-input text-foreground mb-2">
                   <SelectValue placeholder="Select a project" />
                 </SelectTrigger>
-                <SelectContent className="bg-slate-900 border-slate-800 text-slate-100">
-                  {projectNames.length === 0 && <div className="px-2 py-1.5 text-xs text-slate-500">Add items to Project Menu first</div>}
+                <SelectContent className="bg-popover border-border text-popover-foreground">
+                  {projectNames.length === 0 && <div className="px-2 py-1.5 text-xs text-muted-foreground">Add items to Project Menu first</div>}
                   {projectOptions.map((option) => (
                     <SelectItem key={`${option.track}-${option.name}`} value={option.name}>
                       <span className="inline-flex items-center gap-2">
-                        <span className="text-[10px] text-cyan-300">{option.track}</span>
+                        <span className="text-[10px] text-primary">{option.track}</span>
                         <span>{option.name}</span>
                       </span>
                     </SelectItem>
@@ -248,22 +248,22 @@ export function WeeklyView({ full = false }: { full?: boolean }) {
                 value={fp.name}
                 onChange={(e) => updateWeekly((w) => { w.flagshipProjects[idx].name = e.target.value; })}
                 placeholder="Or type a custom flagship"
-                className="bg-slate-950 border-slate-800 text-slate-100 mb-2 h-8 text-xs"
+                className="bg-background border-input text-foreground mb-2 h-8 text-xs"
               />
               <Textarea
                 value={fp.outcome}
                 onChange={(e) => updateWeekly((w) => { w.flagshipProjects[idx].outcome = e.target.value; })}
                 placeholder="Weekly outcome..."
-                className="bg-slate-950 border-slate-800 text-slate-100 text-sm min-h-[60px]"
+                className="bg-background border-input text-foreground text-sm min-h-[60px]"
               />
             </div>
           ))}
         </CardContent>
       </Card>
 
-      <Card className="bg-slate-900 border-slate-800">
+      <Card className="bg-card border-border text-card-foreground">
         <CardHeader className="pb-2">
-          <CardTitle className="text-slate-100 text-base">Parking Lot</CardTitle>
+          <CardTitle className="text-foreground text-base">Parking Lot</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex gap-2 mb-3">
@@ -277,7 +277,7 @@ export function WeeklyView({ full = false }: { full?: boolean }) {
                 }
               }}
               placeholder="Capture an idea, press Enter"
-              className="bg-slate-950 border-slate-800 text-slate-100"
+              className="bg-background border-input text-foreground"
             />
             <button
               onClick={() => {
@@ -286,7 +286,7 @@ export function WeeklyView({ full = false }: { full?: boolean }) {
                   setParkInput('');
                 }
               }}
-              className="px-3 rounded-md bg-cyan-400 text-slate-950 hover:bg-cyan-300 transition-colors"
+              className="px-3 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
             >
               <Plus size={16} />
             </button>
@@ -294,7 +294,7 @@ export function WeeklyView({ full = false }: { full?: boolean }) {
           <div className="space-y-1.5">
             <AnimatePresence>
               {state.weekly.parkingLot.length === 0 && (
-                <div className="text-xs text-slate-500 italic">No parked items yet.</div>
+                <div className="text-xs text-muted-foreground italic">No parked items yet.</div>
               )}
               {state.weekly.parkingLot.map((item, i) => (
                 <motion.div
@@ -303,12 +303,12 @@ export function WeeklyView({ full = false }: { full?: boolean }) {
                   initial={{ opacity: 0, x: -8 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 8 }}
-                  className="flex items-center justify-between bg-slate-950/60 border border-slate-800 rounded-md px-3 py-1.5"
+                  className="flex items-center justify-between bg-background/60 border border-border rounded-md px-3 py-1.5"
                 >
-                  <span className="text-sm text-slate-200">{item}</span>
+                  <span className="text-sm text-foreground">{item}</span>
                   <button
                     onClick={() => updateWeekly((w) => { w.parkingLot.splice(i, 1); })}
-                    className="text-slate-500 hover:text-rose-400 transition-colors"
+                    className="text-muted-foreground hover:text-destructive transition-colors"
                   >
                     <Trash2 size={14} />
                   </button>
@@ -319,41 +319,41 @@ export function WeeklyView({ full = false }: { full?: boolean }) {
         </CardContent>
       </Card>
 
-      <Card className="bg-slate-900 border-slate-800">
+      <Card className="bg-card border-border text-card-foreground">
         <CardHeader className="pb-2">
-          <CardTitle className="text-slate-100 text-base flex items-center gap-2">
-            <BookOpen size={16} className="text-cyan-300" /> Learning Sprint
+          <CardTitle className="text-foreground text-base flex items-center gap-2">
+            <BookOpen size={16} className="text-primary" /> Learning Sprint
           </CardTitle>
         </CardHeader>
         <CardContent className="grid md:grid-cols-2 gap-3">
           <div>
-            <label className="text-[11px] uppercase text-slate-500">Topic</label>
+            <label className="text-[11px] uppercase text-muted-foreground">Topic</label>
             <Input
               value={state.weekly.learningSprint.topic}
               onChange={(e) => updateWeekly((w) => { w.learningSprint.topic = e.target.value; })}
-              className="bg-slate-950 border-slate-800 text-slate-100 mt-1"
+              className="bg-background border-input text-foreground mt-1"
             />
           </div>
           <div>
-            <label className="text-[11px] uppercase text-slate-500">Target</label>
+            <label className="text-[11px] uppercase text-muted-foreground">Target</label>
             <Input
               value={state.weekly.learningSprint.target}
               onChange={(e) => updateWeekly((w) => { w.learningSprint.target = e.target.value; })}
-              className="bg-slate-950 border-slate-800 text-slate-100 mt-1"
+              className="bg-background border-input text-foreground mt-1"
             />
           </div>
         </CardContent>
       </Card>
 
-      <Card className="bg-slate-900 border-slate-800">
+      <Card className="bg-card border-border text-card-foreground">
         <CardHeader className="pb-2">
-          <CardTitle className="text-slate-100 text-base">Weekly Block Schedule</CardTitle>
+          <CardTitle className="text-foreground text-base">Weekly Block Schedule</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-[11px] uppercase text-slate-500 border-b border-slate-800">
+                <tr className="text-[11px] uppercase text-muted-foreground border-b border-border">
                   <th className="text-left py-2 px-2 w-16">Day</th>
                   <th className="text-left py-2 px-2">Morning</th>
                   <th className="text-left py-2 px-2">Afternoon</th>
@@ -367,13 +367,13 @@ export function WeeklyView({ full = false }: { full?: boolean }) {
                   const grade = state.daily[dateKey]?.grade ?? null;
                   const t = state.weekly.dailyThemes[day];
                   return (
-                    <tr key={day} className="border-b border-slate-800/60">
-                      <td className="py-2 px-2 font-medium text-slate-300">{day}</td>
+                    <tr key={day} className="border-b border-border/60">
+                      <td className="py-2 px-2 font-medium text-foreground">{day}</td>
                       <td className="py-1 px-1">
                         <Input
                           value={t.morning}
                           onChange={(e) => updateWeekly((w) => { w.dailyThemes[day].morning = e.target.value; })}
-                          className="bg-slate-950 border-slate-800 text-slate-100 h-8 text-xs"
+                          className="bg-background border-input text-foreground h-8 text-xs"
                           placeholder="Intent"
                         />
                       </td>
@@ -381,7 +381,7 @@ export function WeeklyView({ full = false }: { full?: boolean }) {
                         <Input
                           value={t.afternoon}
                           onChange={(e) => updateWeekly((w) => { w.dailyThemes[day].afternoon = e.target.value; })}
-                          className="bg-slate-950 border-slate-800 text-slate-100 h-8 text-xs"
+                          className="bg-background border-input text-foreground h-8 text-xs"
                           placeholder="Intent"
                         />
                       </td>
@@ -389,7 +389,7 @@ export function WeeklyView({ full = false }: { full?: boolean }) {
                         <Input
                           value={t.evening}
                           onChange={(e) => updateWeekly((w) => { w.dailyThemes[day].evening = e.target.value; })}
-                          className="bg-slate-950 border-slate-800 text-slate-100 h-8 text-xs"
+                          className="bg-background border-input text-foreground h-8 text-xs"
                         />
                       </td>
                       <td className="py-1 px-2">
@@ -406,11 +406,11 @@ export function WeeklyView({ full = false }: { full?: boolean }) {
         </CardContent>
       </Card>
 
-      <Card className="bg-slate-900 border-slate-800">
+      <Card className="bg-card border-border text-card-foreground">
         <CardContent className="p-0">
           <Accordion type="single" collapsible>
             <AccordionItem value="review" className="border-0">
-              <AccordionTrigger className="px-5 py-4 text-slate-100 hover:no-underline">
+              <AccordionTrigger className="px-5 py-4 text-foreground hover:no-underline">
                 Weekly Review Checklist
               </AccordionTrigger>
               <AccordionContent className="px-5 pb-5 space-y-3">
@@ -431,12 +431,12 @@ export function WeeklyView({ full = false }: { full?: boolean }) {
                     <Input
                       value={item.label}
                       onChange={(e) => updateWeekly((w) => { w.reviewCustom[i].label = e.target.value; })}
-                      className="bg-slate-950 border-slate-800 text-slate-100 h-8 text-xs"
+                      className="bg-background border-input text-foreground h-8 text-xs"
                       placeholder="Custom review item"
                     />
                     <button
                       onClick={() => updateWeekly((w) => { w.reviewCustom.splice(i, 1); })}
-                      className="text-slate-500 hover:text-rose-400 transition-colors"
+                      className="text-muted-foreground hover:text-destructive transition-colors"
                       aria-label={`Delete ${item.label}`}
                     >
                       <Trash2 size={13} />
@@ -454,7 +454,7 @@ export function WeeklyView({ full = false }: { full?: boolean }) {
                       }
                     }}
                     placeholder="+ Add custom checklist item"
-                    className="bg-slate-950 border-slate-800 text-slate-100 h-8 text-xs"
+                    className="bg-background border-input text-foreground h-8 text-xs"
                   />
                   <button
                     onClick={() => {
@@ -463,7 +463,7 @@ export function WeeklyView({ full = false }: { full?: boolean }) {
                         setCustomReview('');
                       }
                     }}
-                    className="px-2.5 h-8 rounded-md bg-cyan-400 text-slate-950 hover:bg-cyan-300 transition-colors"
+                    className="px-2.5 h-8 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
                   >
                     <Plus size={14} />
                   </button>
@@ -472,7 +472,7 @@ export function WeeklyView({ full = false }: { full?: boolean }) {
                   value={state.weekly.reviewTweak}
                   onChange={(e) => updateWeekly((w) => { w.reviewTweak = e.target.value; })}
                   placeholder="One concrete tweak for next week..."
-                  className="bg-slate-950 border-slate-800 text-slate-100 mt-2"
+                  className="bg-background border-input text-foreground mt-2"
                 />
               </AccordionContent>
             </AccordionItem>
@@ -480,30 +480,30 @@ export function WeeklyView({ full = false }: { full?: boolean }) {
         </CardContent>
       </Card>
 
-      <Card className="bg-slate-900 border-slate-800">
+      <Card className="bg-card border-border text-card-foreground">
         <CardHeader className="pb-2">
-          <CardTitle className="text-slate-100 text-base flex items-center gap-2">
-            <Archive size={16} className="text-slate-400" /> Weekly Archive
+          <CardTitle className="text-foreground text-base flex items-center gap-2">
+            <Archive size={16} className="text-muted-foreground" /> Weekly Archive
           </CardTitle>
         </CardHeader>
         <CardContent>
           {state.archive.length === 0 ? (
-            <div className="text-xs text-slate-500 italic">No archived weeks yet. Use "New Week" to close out.</div>
+            <div className="text-xs text-muted-foreground italic">No archived weeks yet. Use "New Week" to close out.</div>
           ) : (
             <Accordion type="multiple">
               {state.archive.map((a) => (
-                <AccordionItem key={a.weekStart} value={a.weekStart} className="border-slate-800">
-                  <AccordionTrigger className="hover:no-underline text-slate-200">
+                <AccordionItem key={a.weekStart} value={a.weekStart} className="border-border">
+                  <AccordionTrigger className="hover:no-underline text-foreground">
                     <div className="flex items-center gap-3 text-sm">
                       <span className="font-medium">Week {a.weekNumber}</span>
-                      <span className="text-slate-500 text-xs">{format(new Date(a.weekStart), 'MMM d, yyyy')}</span>
+                      <span className="text-muted-foreground text-xs">{format(new Date(a.weekStart), 'MMM d, yyyy')}</span>
                       <span className="text-amber-300 text-xs">Streak: {a.finalStreak}</span>
                     </div>
                   </AccordionTrigger>
                   <AccordionContent className="space-y-2 text-sm">
-                    <div className="text-slate-400">North Star: <span className="text-slate-200">{a.northStar || 'Not set'}</span></div>
-                    <div className="text-slate-400">P1: <span className="text-slate-200">{a.p1.name || 'Not set'}</span> - {a.p1.outcome}</div>
-                    <div className="text-slate-400">P2: <span className="text-slate-200">{a.p2.name || 'Not set'}</span> - {a.p2.outcome}</div>
+                    <div className="text-muted-foreground">North Star: <span className="text-foreground">{a.northStar || 'Not set'}</span></div>
+                    <div className="text-muted-foreground">P1: <span className="text-foreground">{a.p1.name || 'Not set'}</span> - {a.p1.outcome}</div>
+                    <div className="text-muted-foreground">P2: <span className="text-foreground">{a.p2.name || 'Not set'}</span> - {a.p2.outcome}</div>
                     <div className="flex gap-2 mt-1">
                       {Object.entries(a.dailyGrades).map(([d, g]) => (
                         <span key={d} className={cn('text-[10px] px-1.5 py-0.5 rounded border', gradeBadgeClasses(g))}>

@@ -13,11 +13,11 @@ import { cn } from '@/lib/utils';
 
 function gradeColor(g: Grade) {
   switch (g) {
-    case 'A': return 'bg-gradient-to-br from-cyan-200 to-teal-300 text-slate-950 grade-A-glow';
-    case 'B': return 'bg-gradient-to-br from-sky-200 to-cyan-300 text-slate-950 grade-B-glow';
-    case 'C': return 'bg-gradient-to-br from-indigo-300 to-sky-400 text-slate-950 grade-C-glow';
-    case 'D': return 'bg-slate-700 text-slate-300';
-    default: return 'bg-slate-800 text-slate-500';
+    case 'A': return 'bg-primary text-primary-foreground grade-A-glow';
+    case 'B': return 'bg-secondary text-secondary-foreground grade-B-glow';
+    case 'C': return 'bg-accent text-accent-foreground grade-C-glow';
+    case 'D': return 'bg-muted text-muted-foreground';
+    default: return 'bg-muted text-muted-foreground';
   }
 }
 
@@ -59,9 +59,9 @@ export function DailyView({ focusMode = false }: { focusMode?: boolean }) {
 
   return (
     <div className="space-y-4">
-      <Card className="bg-slate-900 border-slate-800">
+      <Card className="bg-card border-border text-card-foreground">
         <CardContent className="p-4 flex flex-wrap items-center gap-2">
-          <span className="text-xs uppercase text-slate-500 mr-2">Date</span>
+          <span className="text-xs uppercase text-muted-foreground mr-2">Date</span>
           {weekDates.map((dk) => {
             const dt = new Date(dk);
             const disabled = isAfter(dt, new Date());
@@ -73,8 +73,8 @@ export function DailyView({ focusMode = false }: { focusMode?: boolean }) {
                 className={cn(
                   'px-3 py-1.5 rounded-md text-xs border transition-colors',
                   dk === selectedDate
-                    ? 'bg-cyan-400 text-slate-950 border-cyan-300'
-                    : 'bg-slate-950 text-slate-300 border-slate-800 hover:border-slate-600',
+                    ? 'bg-primary text-primary-foreground border-primary'
+                    : 'bg-background text-foreground border-border hover:border-primary/60',
                   disabled && 'opacity-40 cursor-not-allowed'
                 )}
               >
@@ -85,22 +85,22 @@ export function DailyView({ focusMode = false }: { focusMode?: boolean }) {
         </CardContent>
       </Card>
 
-      <Card className="bg-slate-900 border-slate-800">
+      <Card className="bg-card border-border text-card-foreground">
         <CardContent className="p-0">
           <Accordion type="single" collapsible defaultValue="phase1">
             <AccordionItem value="phase1" className="border-0">
-              <AccordionTrigger className="px-5 py-4 hover:no-underline text-slate-100">
+              <AccordionTrigger className="px-5 py-4 hover:no-underline text-foreground">
                 <div className="flex items-center gap-2">
-                  <Compass size={16} className="text-cyan-300" /> Phase 1 · Morning Priming
+                  <Compass size={16} className="text-primary" /> Phase 1 · Morning Priming
                 </div>
               </AccordionTrigger>
               <AccordionContent className="px-5 pb-5 space-y-3">
                 <div>
-                  <label className="text-[11px] uppercase text-slate-500">North Star (today)</label>
+                  <label className="text-[11px] uppercase text-muted-foreground">North Star (today)</label>
                   <Input
                     value={d.northStar}
                     onChange={(e) => updateDaily(selectedDate, (x) => { x.northStar = e.target.value; })}
-                    className="bg-slate-950 border-slate-800 text-slate-100 mt-1"
+                    className="bg-background border-input text-foreground mt-1"
                     placeholder="What makes today a win?"
                   />
                 </div>
@@ -108,7 +108,7 @@ export function DailyView({ focusMode = false }: { focusMode?: boolean }) {
                 <AnimatedCheck checked={d.workspaceReady} onChange={(v) => updateDaily(selectedDate, (x) => { x.workspaceReady = v; })} label="Workspace Ready" />
                 <button
                   onClick={() => block2Ref.current?.scrollIntoView({ behavior: 'smooth' })}
-                  className="mt-2 px-4 py-2 rounded-md bg-cyan-400 text-slate-950 font-semibold text-sm hover:bg-cyan-300 transition-colors inline-flex items-center gap-1.5"
+                  className="mt-2 px-4 py-2 rounded-md bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 transition-colors inline-flex items-center gap-1.5"
                 >
                   Lock In <ChevronRight size={14} />
                 </button>
@@ -122,13 +122,13 @@ export function DailyView({ focusMode = false }: { focusMode?: boolean }) {
         <DeepBlock label="Phase 2 · Deep Block I" block={d.block1} dateKey={selectedDate} which="block1" projects={projects} highlight />
       </div>
 
-      <Card className="bg-slate-900 border-slate-800">
+      <Card className="bg-card border-border text-card-foreground">
         <CardContent className="p-0">
           <Accordion type="single" collapsible>
             <AccordionItem value="buffer" className="border-0">
-              <AccordionTrigger className="px-5 py-4 hover:no-underline text-slate-100">
+              <AccordionTrigger className="px-5 py-4 hover:no-underline text-foreground">
                 <div className="flex items-center gap-2">
-                  <ShieldCheck size={16} className="text-cyan-300" /> Phase 3 · Buffer Zone
+                  <ShieldCheck size={16} className="text-primary" /> Phase 3 · Buffer Zone
                 </div>
               </AccordionTrigger>
               <AccordionContent className="px-5 pb-5 space-y-2">
@@ -149,7 +149,7 @@ export function DailyView({ focusMode = false }: { focusMode?: boolean }) {
                     <Input
                       value={item.label}
                       onChange={(e) => updateDaily(selectedDate, (x) => { x.customChecks[i].label = e.target.value; })}
-                      className="bg-slate-950 border-slate-800 text-slate-100 h-8 text-xs"
+                      className="bg-background border-input text-foreground h-8 text-xs"
                       placeholder="Custom checklist item"
                     />
                   </div>
@@ -165,7 +165,7 @@ export function DailyView({ focusMode = false }: { focusMode?: boolean }) {
                       }
                     }}
                     placeholder="+ Add custom checklist item"
-                    className="bg-slate-950 border-slate-800 text-slate-100 h-8 text-xs"
+                    className="bg-background border-input text-foreground h-8 text-xs"
                   />
                   <button
                     onClick={() => {
@@ -174,7 +174,7 @@ export function DailyView({ focusMode = false }: { focusMode?: boolean }) {
                         setCustomCheck('');
                       }
                     }}
-                    className="px-2.5 h-8 rounded-md bg-cyan-400 text-slate-950 hover:bg-cyan-300 transition-colors"
+                    className="px-2.5 h-8 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
                   >
                     Add
                   </button>
@@ -187,15 +187,15 @@ export function DailyView({ focusMode = false }: { focusMode?: boolean }) {
 
       <DeepBlock label="Phase 4 · Deep Block II" block={d.block2} dateKey={selectedDate} which="block2" projects={projects} />
 
-      <Card className="bg-slate-900 border-slate-800">
+      <Card className="bg-card border-border text-card-foreground">
         <CardHeader className="pb-2">
-          <CardTitle className="text-slate-100 text-base flex items-center gap-2">
-            <Briefcase size={16} className="text-cyan-300" /> Phase 5 · Evening Shutdown
+          <CardTitle className="text-foreground text-base flex items-center gap-2">
+            <Briefcase size={16} className="text-primary" /> Phase 5 · Evening Shutdown
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div>
-            <label className="text-[11px] uppercase text-slate-500">Win Log · Shipped Today</label>
+            <label className="text-[11px] uppercase text-muted-foreground">Win Log · Shipped Today</label>
             <div className="space-y-2 mt-1">
               {[0, 1, 2].map((i) => (
                 <Input
@@ -203,7 +203,7 @@ export function DailyView({ focusMode = false }: { focusMode?: boolean }) {
                   value={d.winLog[i]}
                   onChange={(e) => updateDaily(selectedDate, (x) => { x.winLog[i] = e.target.value; })}
                   placeholder={`${i + 1}. Concrete artifact shipped`}
-                  className="bg-slate-950 border-slate-800 text-slate-100"
+                  className="bg-background border-input text-foreground"
                 />
               ))}
             </div>
@@ -214,21 +214,21 @@ export function DailyView({ focusMode = false }: { focusMode?: boolean }) {
             label="Parking Lot Pruned"
           />
           <div>
-            <label className="text-[11px] uppercase text-slate-500">Tomorrow Primed</label>
+            <label className="text-[11px] uppercase text-muted-foreground">Tomorrow Primed</label>
             <Input
               value={d.tomorrowPrimed}
               onChange={(e) => updateDaily(selectedDate, (x) => { x.tomorrowPrimed = e.target.value; })}
               placeholder="First move tomorrow..."
-              className="bg-slate-950 border-slate-800 text-slate-100 mt-1"
+              className="bg-background border-input text-foreground mt-1"
             />
           </div>
         </CardContent>
       </Card>
 
-      <Card className="bg-slate-900 border-slate-800">
+      <Card className="bg-card border-border text-card-foreground">
         <CardHeader className="pb-2">
-          <CardTitle className="text-slate-100 text-base flex items-center gap-2">
-            <Gift size={16} className="text-cyan-300" /> Phase 6 · Earned Dopamine
+          <CardTitle className="text-foreground text-base flex items-center gap-2">
+            <Gift size={16} className="text-primary" /> Phase 6 · Earned Dopamine
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -236,9 +236,9 @@ export function DailyView({ focusMode = false }: { focusMode?: boolean }) {
             value={d.reward.text}
             onChange={(e) => updateDaily(selectedDate, (x) => { x.reward.text = e.target.value; })}
             placeholder="Reward (e.g., 1 YouTube doc, Gaming 1hr)"
-            className="bg-slate-950 border-slate-800 text-slate-100"
+            className="bg-background border-input text-foreground"
           />
-          {!rewardEnabled && <div className="text-xs text-slate-500 italic">Unlocks when both Deep Blocks are complete.</div>}
+          {!rewardEnabled && <div className="text-xs text-muted-foreground italic">Unlocks when both Deep Blocks are complete.</div>}
           <div className="flex gap-2">
             <button
               disabled={!rewardEnabled}
@@ -246,8 +246,8 @@ export function DailyView({ focusMode = false }: { focusMode?: boolean }) {
               className={cn(
                 'px-4 py-2 rounded-md text-sm font-medium border transition-colors',
                 d.reward.claimed && !d.reward.stolen
-                  ? 'bg-cyan-400 text-slate-950 border-cyan-300'
-                  : 'bg-slate-950 text-slate-300 border-slate-800 hover:border-cyan-500',
+                  ? 'bg-primary text-primary-foreground border-primary'
+                  : 'bg-background text-foreground border-border hover:border-primary/60',
                 !rewardEnabled && 'opacity-40 cursor-not-allowed'
               )}
             >
@@ -259,8 +259,8 @@ export function DailyView({ focusMode = false }: { focusMode?: boolean }) {
               className={cn(
                 'px-4 py-2 rounded-md text-sm font-medium border transition-colors',
                 d.reward.stolen
-                  ? 'bg-rose-500 text-slate-950 border-rose-400'
-                  : 'bg-slate-950 text-slate-300 border-slate-800 hover:border-rose-500',
+                  ? 'bg-destructive text-destructive-foreground border-destructive'
+                  : 'bg-background text-foreground border-border hover:border-destructive/60',
                 !rewardEnabled && 'opacity-40 cursor-not-allowed'
               )}
             >
@@ -270,9 +270,9 @@ export function DailyView({ focusMode = false }: { focusMode?: boolean }) {
         </CardContent>
       </Card>
 
-      <Card className="bg-slate-900 border-slate-800">
+      <Card className="bg-card border-border text-card-foreground">
         <CardHeader className="pb-2">
-          <CardTitle className="text-slate-100 text-base flex items-center gap-2">
+          <CardTitle className="text-foreground text-base flex items-center gap-2">
             <AlertTriangle size={16} className="text-amber-400" /> Phase 7 · Anti-Hallucination Check
           </CardTitle>
         </CardHeader>
@@ -283,21 +283,21 @@ export function DailyView({ focusMode = false }: { focusMode?: boolean }) {
             'If my future self watched a timelapse, respect or disappointment?',
           ].map((q, i) => (
             <div key={i}>
-              <label className="text-xs text-slate-400">{q}</label>
+              <label className="text-xs text-muted-foreground">{q}</label>
               <Textarea
                 value={d.hallucination[i]}
                 onChange={(e) => updateDaily(selectedDate, (x) => { x.hallucination[i] = e.target.value; })}
-                className="bg-slate-950 border-slate-800 text-slate-100 mt-1 min-h-[60px]"
+                className="bg-background border-input text-foreground mt-1 min-h-[60px]"
               />
             </div>
           ))}
         </CardContent>
       </Card>
 
-      <Card className="bg-slate-900 border-slate-800">
+      <Card className="bg-card border-border text-card-foreground">
         <CardHeader className="pb-2">
-          <CardTitle className="text-slate-100 text-base flex items-center gap-2">
-            <Trophy size={16} className="text-cyan-300" /> Phase 8 · Daily Scoreboard
+          <CardTitle className="text-foreground text-base flex items-center gap-2">
+            <Trophy size={16} className="text-primary" /> Phase 8 · Daily Scoreboard
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -305,9 +305,9 @@ export function DailyView({ focusMode = false }: { focusMode?: boolean }) {
             {scoreboard.map((s, i) => (
               <div key={i} className={cn(
                 'flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs',
-                s.on ? 'bg-cyan-500/10 border-cyan-500/40 text-cyan-100' : 'bg-slate-800/60 border-slate-700 text-slate-400'
+                s.on ? 'bg-primary/10 border-primary/40 text-primary' : 'bg-muted/60 border-border text-muted-foreground'
               )}>
-                <span className={cn('w-1.5 h-1.5 rounded-full', s.on ? 'bg-cyan-300' : 'bg-slate-600')} />
+                <span className={cn('w-1.5 h-1.5 rounded-full', s.on ? 'bg-primary' : 'bg-muted-foreground')} />
                 {s.label}
               </div>
             ))}
@@ -331,14 +331,14 @@ export function DailyView({ focusMode = false }: { focusMode?: boolean }) {
             {d.grade ?? 'Pending'}
             <span className="text-xs font-normal opacity-80 ml-1">daily grade</span>
           </motion.div>
-          <div className="mt-3 text-xs text-slate-500">
+          <div className="mt-3 text-xs text-muted-foreground">
             {d.grade === 'A' && 'Both blocks complete, zero switching, real wins logged.'}
             {d.grade === 'B' && 'Both blocks complete.'}
             {d.grade === 'C' && 'Only one block complete.'}
             {d.grade === 'D' && (
               <span className="inline-flex items-center gap-2">
-                <span className="px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-400">Unplanned</span>
-                <button onClick={() => setView('daily')} className="text-cyan-300 hover:text-cyan-200">Plan Tomorrow</button>
+                <span className="px-2 py-0.5 rounded bg-muted border border-border text-muted-foreground">Unplanned</span>
+                <button onClick={() => setView('daily')} className="text-primary hover:text-primary/80">Plan Tomorrow</button>
               </span>
             )}
           </div>

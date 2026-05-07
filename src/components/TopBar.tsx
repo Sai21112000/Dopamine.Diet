@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Zap, Download, Upload, RefreshCw, Focus, Calendar as CalIcon } from 'lucide-react';
+import { Zap, Download, Upload, RefreshCw, Focus, Calendar as CalIcon, Moon, Sun } from 'lucide-react';
+import { useTheme } from 'next-themes';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { useStore, ViewMode, AppState } from '@/store/useStore';
@@ -41,6 +42,9 @@ function buildMarkdownExport(state: AppState) {
     '### Parking Lot',
     ...(state.weekly.parkingLot.length ? state.weekly.parkingLot.map((item) => `- ${item}`) : ['- Empty']),
     '',
+    '### Global Todo List',
+    ...(state.todos.length ? state.todos.map((todo) => `- [${checked(todo.done)}] ${todo.text || 'Untitled task'}`) : ['- Empty']),
+    '',
     '## Daily Log',
     '',
     ...Object.entries(state.daily).flatMap(([date, day]) => [
@@ -70,7 +74,9 @@ export function TopBar() {
   const state = useStore((s) => s.state);
   const importData = useStore((s) => s.importData);
   const archiveWeek = useStore((s) => s.archiveWeek);
+  const { theme, setTheme } = useTheme();
   const fileRef = useRef<HTMLInputElement>(null);
+  const darkMode = theme === 'dark';
 
   const exportMarkdown = () => {
     const blob = new Blob([buildMarkdownExport(state)], { type: 'text/markdown' });
@@ -100,19 +106,19 @@ export function TopBar() {
   };
 
   return (
-    <div className="sticky top-0 z-50 backdrop-blur bg-slate-950/85 border-b border-cyan-950/70">
+    <div className="sticky top-0 z-50 border-b border-border bg-background/85 backdrop-blur">
       <div className="max-w-[1600px] mx-auto px-4 py-3 flex flex-wrap items-center gap-3">
         <div className="flex items-center gap-2">
           <motion.div
             animate={{ rotate: [0, -8, 8, 0] }}
             transition={{ duration: 2.5, repeat: Infinity, repeatDelay: 4 }}
-            className="w-9 h-9 rounded-lg bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center"
+            className="w-9 h-9 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center"
           >
-            <Zap className="text-cyan-300" size={20} />
+            <Zap className="text-primary" size={20} />
           </motion.div>
           <div className="leading-tight">
-            <div className="text-sm font-semibold text-slate-100">Dopamine.Diet</div>
-            <div className="text-[11px] text-slate-500 flex items-center gap-1">
+            <div className="text-sm font-semibold text-foreground">Dopamine.Diet</div>
+            <div className="text-[11px] text-muted-foreground flex items-center gap-1">
               <CalIcon size={11} />
               {format(new Date(), 'EEEE, MMM d, yyyy')}
             </div>
@@ -121,20 +127,20 @@ export function TopBar() {
 
         <div className="flex-1" />
 
-        <div className="flex items-center rounded-lg bg-slate-900 border border-slate-800 p-0.5">
+        <div className="flex items-center rounded-lg bg-muted border border-border p-0.5">
           {VIEWS.map((v) => (
             <button
               key={v.key}
               onClick={() => setView(v.key)}
               className={cn(
                 'relative px-3 py-1.5 text-xs font-medium rounded-md transition-colors',
-                view === v.key ? 'text-slate-950' : 'text-slate-400 hover:text-slate-200'
+                view === v.key ? 'text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
               )}
             >
               {view === v.key && (
                 <motion.div
                   layoutId="viewPill"
-                  className="absolute inset-0 bg-cyan-300 rounded-md"
+                  className="absolute inset-0 bg-primary rounded-md"
                   transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                 />
               )}
@@ -143,10 +149,14 @@ export function TopBar() {
           ))}
         </div>
 
-        <Button variant="ghost" size="sm" onClick={exportMarkdown} className="text-slate-300 hover:text-white hover:bg-slate-800">
+        <Button variant="ghost" size="sm" onClick={() => setTheme(darkMode ? 'light' : 'dark')} aria-label="Toggle theme">
+          {darkMode ? <Sun size={14} className="mr-1.5" /> : <Moon size={14} className="mr-1.5" />}
+          {darkMode ? 'Light' : 'Dark'}
+        </Button>
+        <Button variant="ghost" size="sm" onClick={exportMarkdown}>
           <Download size={14} className="mr-1.5" /> Export Markdown
         </Button>
-        <Button variant="ghost" size="sm" onClick={() => fileRef.current?.click()} className="text-slate-300 hover:text-white hover:bg-slate-800">
+        <Button variant="ghost" size="sm" onClick={() => fileRef.current?.click()}>
           <Upload size={14} className="mr-1.5" /> Import
         </Button>
         <input
@@ -160,7 +170,7 @@ export function TopBar() {
             e.target.value = '';
           }}
         />
-        <Button variant="ghost" size="sm" onClick={newWeek} className="text-slate-300 hover:text-white hover:bg-slate-800">
+        <Button variant="ghost" size="sm" onClick={newWeek}>
           <RefreshCw size={14} className="mr-1.5" /> New Week
         </Button>
         <Button
@@ -169,8 +179,8 @@ export function TopBar() {
           onClick={() => setFocus(!focusMode)}
           className={cn(
             focusMode
-              ? 'bg-cyan-400 text-slate-950 hover:bg-cyan-300'
-              : 'text-slate-300 hover:text-white hover:bg-slate-800'
+              ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+              : ''
           )}
         >
           <Focus size={14} className="mr-1.5" /> {focusMode ? 'Exit Focus' : 'Focus'}

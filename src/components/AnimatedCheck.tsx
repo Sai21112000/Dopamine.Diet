@@ -27,8 +27,8 @@ export function AnimatedCheck({ checked, onChange, label, size = 24, className }
         className={cn(
           'rounded-md border flex items-center justify-center transition-colors',
           checked
-            ? 'bg-cyan-400 border-cyan-300 text-slate-950'
-            : 'bg-slate-900 border-slate-700 text-transparent group-hover:border-cyan-500/60'
+            ? 'bg-primary border-primary text-primary-foreground'
+            : 'bg-background border-border text-transparent group-hover:border-primary/60'
         )}
       >
         <motion.span
@@ -46,7 +46,7 @@ export function AnimatedCheck({ checked, onChange, label, size = 24, className }
             tick();
             onChange(!checked);
           }}
-          className="text-left text-sm text-slate-200 leading-snug hover:text-cyan-100"
+          className="text-left text-sm text-foreground leading-snug hover:text-primary"
         >
           {label}
         </button>

@@ -6,11 +6,11 @@ import { cn } from '@/lib/utils';
 
 function gradeColor(g: Grade | undefined) {
   switch (g) {
-    case 'A': return 'bg-cyan-300';
+    case 'A': return 'bg-primary';
     case 'B': return 'bg-teal-500/80';
     case 'C': return 'bg-sky-800/70';
     case 'D': return 'bg-indigo-950';
-    default: return 'bg-slate-800';
+    default: return 'bg-muted';
   }
 }
 
@@ -58,15 +58,15 @@ export function ContributionGraph({ large = false }: { large?: boolean }) {
                     <div
                       style={{ width: sz, height: sz }}
                       title={cell.date ? `${format(new Date(cell.date), 'MMM d')} - Grade ${cell.grade ?? 'Pending'}` : undefined}
-                      className={cn('rounded-[2px] transition-colors', cell.date ? gradeColor(cell.grade) : 'bg-slate-900/60')}
+                      className={cn('rounded-[2px] transition-colors', cell.date ? gradeColor(cell.grade) : 'bg-muted/60')}
                     />
                   </TooltipTrigger>
                   {cell.date && (
-                    <TooltipContent className="bg-slate-900 border-slate-800 text-slate-100">
+                    <TooltipContent className="bg-popover border-border text-popover-foreground">
                       <div className="text-xs">
                         <div className="font-medium">{format(new Date(cell.date), 'MMM d, yyyy')}</div>
-                        <div className="text-slate-400">Grade: {cell.grade ?? 'Pending'}</div>
-                        {weeklyNorth && <div className="text-slate-500 text-[10px] mt-1 max-w-[160px]">{weeklyNorth}</div>}
+                        <div className="text-muted-foreground">Grade: {cell.grade ?? 'Pending'}</div>
+                        {weeklyNorth && <div className="text-muted-foreground text-[10px] mt-1 max-w-[160px]">{weeklyNorth}</div>}
                       </div>
                     </TooltipContent>
                   )}
@@ -75,12 +75,12 @@ export function ContributionGraph({ large = false }: { large?: boolean }) {
             </div>
           ))}
         </div>
-        <div className="flex items-center gap-2 mt-3 text-[11px] text-slate-500">
+        <div className="flex items-center gap-2 mt-3 text-[11px] text-muted-foreground">
           <span>Less</span>
-          <div className="w-2.5 h-2.5 rounded-[2px] bg-slate-800" />
+          <div className="w-2.5 h-2.5 rounded-[2px] bg-muted" />
           <div className="w-2.5 h-2.5 rounded-[2px] bg-sky-800/70" />
           <div className="w-2.5 h-2.5 rounded-[2px] bg-teal-500/80" />
-          <div className="w-2.5 h-2.5 rounded-[2px] bg-cyan-300" />
+          <div className="w-2.5 h-2.5 rounded-[2px] bg-primary" />
           <span>More</span>
         </div>
       </div>
